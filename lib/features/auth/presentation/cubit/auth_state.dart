@@ -79,6 +79,30 @@ class OtpResendSuccess extends AuthState {
   List<Object?> get props => [message];
 }
 
+// Forgot password states
+class ForgotPasswordSuccess extends AuthState {
+  final String email;
+  final String message;
+
+  const ForgotPasswordSuccess({
+    required this.email,
+    required this.message,
+  });
+
+  @override
+  List<Object?> get props => [email, message];
+}
+
+// Reset password states
+class ResetPasswordSuccess extends AuthState {
+  final String message;
+
+  const ResetPasswordSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 // Authenticated state
 class Authenticated extends AuthState {
   final User user;

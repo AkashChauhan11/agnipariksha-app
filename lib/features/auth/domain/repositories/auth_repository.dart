@@ -25,6 +25,16 @@ abstract class AuthRepository {
     required String email,
   });
 
+  Future<Either<Failure, Map<String, dynamic>>> forgotPassword({
+    required String email,
+  });
+
+  Future<Either<Failure, Map<String, dynamic>>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
+
   Future<Either<Failure, User>> getCurrentUser();
   
   Future<Either<Failure, void>> logout();

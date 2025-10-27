@@ -28,6 +28,16 @@ abstract class AuthRemoteDataSource {
     required String email,
   });
 
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  });
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
+
   Future<UserModel> getCurrentUser();
   
   Future<void> logout();
@@ -188,6 +198,59 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return UserModel.fromJson(userJson);
     } catch (e) {
       throw CacheException('Failed to get user data');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await apiService.post(
+        ApiConstants.forgotPassword,
+        data: {
+          'email': email,
+        },
+      );
+
+      // Extract data from nested response structure
+      final responseData = response.data as Map<String, dynamic>;
+      
+      // For forgot password, the message might be at root level
+      return {
+        'message': responseData['message'] ?? 'Password reset OTP has been sent to your email',
+        if (responseData['data'] != null) ...responseData['data'] as Map<String, dynamic>,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await apiService.post(
+        ApiConstants.resetPassword,
+        data: {
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+        },
+      );
+
+      // Extract data from nested response structure
+      final responseData = response.data as Map<String, dynamic>;
+      
+      return {
+        'message': responseData['message'] ?? 'Password has been reset successfully',
+        if (responseData['data'] != null) ...responseData['data'] as Map<String, dynamic>,
+      };
+    } catch (e) {
+      rethrow;
     }
   }
 

@@ -4,6 +4,8 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/otp_verification_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
@@ -49,6 +51,27 @@ class AppRouter {
           return MaterialPage(
             key: state.pageKey,
             child: OtpVerificationPage(
+              email: email ?? '',
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.forgotPassword,
+        name: 'forgot-password',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: const ForgotPasswordPage(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.resetPassword,
+        name: 'reset-password',
+        pageBuilder: (context, state) {
+          final email = state.extra as String?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: ResetPasswordPage(
               email: email ?? '',
             ),
           );

@@ -14,6 +14,7 @@ import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'features/dashboard/data/repositories/quiz_repository_impl.dart';
 import 'features/dashboard/data/data_sources/dashboard_remote_data_source.dart';
 import 'features/dashboard/data/data_sources/quiz_data_source.dart';
+import 'features/tag/presentation/cubit/tag_cubit.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -53,6 +54,10 @@ class MyApp extends StatelessWidget {
             // Auth Cubit
             BlocProvider<AuthCubit>(
               create: (context) => di.sl<AuthCubit>(),
+            ),
+            // Tag Cubit
+            BlocProvider<TagCubit>(
+              create: (context) => di.sl<TagCubit>()..fetchMainTags(),
             ),
             // Dashboard BLoC
             BlocProvider<DashboardBloc>(

@@ -33,8 +33,12 @@ class AppTheme {
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
+          fillColor: Colors.red
+          ,
           border: OutlineInputBorder(
+            
             borderRadius: BorderRadius.circular(12),
+
           ),
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(

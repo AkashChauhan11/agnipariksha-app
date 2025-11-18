@@ -13,5 +13,11 @@ class RouteNames {
   // Quiz routes
   static const String quiz = '/quiz';
   static const String quizResult = '/quiz-result';
+  
+  // Tag routes
+  static const String mainTags = '/main-tags';
+  static const String subjectTags = '/subject-tags';
+  static const String subTags = '/sub-tags/:tagId';
+  static const String createQuiz = '/create-quiz';
 }
 

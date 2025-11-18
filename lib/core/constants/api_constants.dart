@@ -1,6 +1,6 @@
 class ApiConstants {
   // Base URL - Update this with your actual backend URL
-  static const String baseUrl = 'http://192.168.1.8:3000';
+  static const String baseUrl = 'http://192.168.1.12:3000';
   
   // API Endpoints
   static const String register = '/auth/register';

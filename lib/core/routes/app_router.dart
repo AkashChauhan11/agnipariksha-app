@@ -7,6 +7,10 @@ import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/tag/presentation/pages/main_tags_page.dart';
+import '../../features/tag/presentation/pages/subject_tags_page.dart';
+import '../../features/tag/presentation/pages/sub_tags_page.dart';
+import '../../features/tag/presentation/pages/create_quiz_page.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
 
@@ -83,6 +87,53 @@ class AppRouter {
         pageBuilder: (context, state) => MaterialPage(
           key: state.pageKey,
           child: const DashboardScreen(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.mainTags,
+        name: 'main-tags',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: const MainTagsPage(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.subjectTags,
+        name: 'subject-tags',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: SubjectTagsPage(
+              parentTagId: extra?['parentTagId'] as String?,
+              parentTagName: extra?['parentTagName'] as String?,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.subTags,
+        name: 'sub-tags',
+        pageBuilder: (context, state) {
+          final tagId = state.pathParameters['tagId']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: SubTagsPage(
+              tagId: tagId,
+              tagName: extra?['tagName'] as String? ?? 'Tag',
+              parentTagId: extra?['parentTagId'] as String?,
+              parentTagName: extra?['parentTagName'] as String?,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.createQuiz,
+        name: 'create-quiz',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: const CreateQuizPage(),
         ),
       ),
     ],

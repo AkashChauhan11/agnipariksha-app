@@ -1,9 +1,8 @@
-import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failures.dart';
+import 'package:agni_pariksha/utils/typedef.dart';
 import '../entities/user.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, Map<String, dynamic>>> register({
+  ResultFuture<Map<String, dynamic>> register({
     required String firstName,
     required String lastName,
     required String email,
@@ -11,32 +10,34 @@ abstract class AuthRepository {
     String? phone,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> login({
+  ResultFuture<Map<String, dynamic>> login({
     required String email,
     required String password,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> verifyOtp({
+  ResultFuture<Map<String, dynamic>> verifyOtp({
     required String email,
     required String otp,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> resendOtp({
+  ResultFuture<Map<String, dynamic>> resendOtp({
     required String email,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> forgotPassword({
+  ResultFuture<Map<String, dynamic>> forgotPassword({
     required String email,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> resetPassword({
+  ResultFuture<Map<String, dynamic>> resetPassword({
     required String email,
     required String otp,
     required String newPassword,
   });
 
-  Future<Either<Failure, User>> getCurrentUser();
+  ResultFuture<User> getCurrentUser();
   
-  Future<Either<Failure, void>> logout();
+  ResultVoid logout();
 }
+
+//
 

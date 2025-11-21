@@ -24,14 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  @override
-  void initState() {
-    super.initState();
-    // Check if user is already logged in
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthCubit>().checkAuthStatus();
-    });
-  }
+
 
   @override
   void dispose() {
@@ -61,12 +54,11 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<AuthCubit, AuthState>(
+      body:   (1==1) ? Center(child: CircularProgressIndicator()) : BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is Authenticated) {
-            // User is already logged in, redirect to dashboard
-            context.go('/dashboard');
-          } else if (state is RegistrationSuccess) {
+         if (state is RegistrationSuccess) {
+
+            //Registration successful, show snackbar and redirect to OTP verification page
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -79,7 +71,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 context.go('/otp-verification', extra: state.email);
               }
             });
-          } else if (state is AuthError) {
+          } 
+          //Registration failed, show snackbar
+          else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),

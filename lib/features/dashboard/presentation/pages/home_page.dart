@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../widgets/banner_carousel.dart';
 import '../widgets/category_grid.dart';
-import '../../../tag/presentation/cubit/tag_cubit.dart';
-import '../../../tag/presentation/cubit/tag_state.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -52,50 +51,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      BlocBuilder<TagCubit, TagState>(
-                        builder: (context, tagState) {
-                          if (tagState is TagLoading) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (tagState is TagLoaded) {
-                            return Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: tagState.tags.map((tag) {
-                                return Card(
-                                  child: InkWell(
-                                    onTap: () {
-                                      // Check if it's PYQ tag
-                                      if (tag.name.toLowerCase() == 'pyq') {
-                                        // Navigate to subject list first
-                                        context.push('/subject-tags', extra: {
-                                          'parentTagId': tag.id,
-                                          'parentTagName': tag.name,
-                                        });
-                                      } else {
-                                        // Navigate directly to sub-tags
-                                        context.push('/sub-tags/${tag.id}', extra: {
-                                          'tagName': tag.name,
-                                          'tagId': tag.id,
-                                        });
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
-                                      child: Text(tag.name),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            );
-                          } else if (tagState is TagError) {
-                            return Text('Error: ${tagState.message}');
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
+                     Text('Categories'),
                     ],
                   ),
                 ),

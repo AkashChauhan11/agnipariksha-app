@@ -56,9 +56,7 @@ void main() {
             ),
           ),
         ],
-        child: ThemeSwitcher(
-          child: const MyApp(),
-        ),
+        child: const MyApp(),
       ),
     );
 
@@ -66,6 +64,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify that the app loads without crashing
-    expect(find.byType(ThemeSwitcher), findsOneWidget);
+    expect(find.byType(MyApp), findsOneWidget);
   });
 }

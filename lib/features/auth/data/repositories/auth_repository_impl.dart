@@ -1,3 +1,4 @@
+import 'package:agni_pariksha/utils/typedef.dart';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
@@ -11,7 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> register({
+  ResultFuture<DataMap> register({
     required String firstName,
     required String lastName,
     required String email,
@@ -28,18 +29,18 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } on ValidationException catch (e) {
-      return Left(ValidationFailure(e.message));
+      return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> login({
+  ResultFuture<DataMap> login({
     required String email,
     required String password,
   }) async {
@@ -50,20 +51,20 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } on UnauthorizedException catch (e) {
-      return Left(UnauthorizedFailure(e.message));
+      return Left(UnauthorizedFailure(e.message, e.statusCode));
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } on ValidationException catch (e) {
-      return Left(ValidationFailure(e.message));
+      return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> verifyOtp({
+  ResultFuture<DataMap> verifyOtp({
     required String email,
     required String otp,
   }) async {
@@ -74,52 +75,52 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode      ));
     } on ValidationException catch (e) {
-      return Left(ValidationFailure(e.message));
+      return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> resendOtp({
+  ResultFuture<DataMap> resendOtp({
     required String email,
   }) async {
     try {
       final result = await remoteDataSource.resendOtp(email: email);
       return Right(result);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> forgotPassword({
+  ResultFuture<DataMap> forgotPassword({
     required String email,
   }) async {
     try {
       final result = await remoteDataSource.forgotPassword(email: email);
       return Right(result);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } on ValidationException catch (e) {
-      return Left(ValidationFailure(e.message));
+      return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> resetPassword({
+  ResultFuture<DataMap> resetPassword({
     required String email,
     required String otp,
     required String newPassword,
@@ -132,37 +133,37 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(result);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
+      return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } on ValidationException catch (e) {
-      return Left(ValidationFailure(e.message));
+      return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(ServerFailure('Unexpected error occurred'));
+      return Left(ServerFailure('Unexpected error occurred', 500));
     }
   }
 
   @override
-  Future<Either<Failure, User>> getCurrentUser() async {
+  ResultFuture<User> getCurrentUser() async {
     try {
       final userModel = await remoteDataSource.getCurrentUser();
       return Right(userModel.toEntity());
     } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
+      return Left(CacheFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(CacheFailure('Failed to get user'));
+      return Left(CacheFailure('Failed to get user', 500));
     }
   }
 
   @override
-  Future<Either<Failure, void>> logout() async {
+  ResultVoid logout() async {
     try {
       await remoteDataSource.logout();
       return const Right(null);
     } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
+      return Left(CacheFailure(e.message, e.statusCode));
     } catch (e) {
-      return Left(CacheFailure('Failed to logout'));
+      return Left(CacheFailure('Failed to logout', 500));
     }
   }
 }

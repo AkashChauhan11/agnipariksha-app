@@ -40,32 +40,7 @@ class DashboardScreen extends StatelessWidget {
             appBar: AppBar(
               title: const Text('Quiz Dashboard'),
               centerTitle: true,
-              actions: [
-                Builder(
-                  builder: (context) {
-                    final themeModeNotifier = ThemeSwitcher.of(context).themeModeNotifier;
-                    return ValueListenableBuilder<ThemeMode>(
-                      valueListenable: themeModeNotifier,
-                      builder: (context, mode, _) {
-                        return IconButton(
-                          icon: Icon(
-                            mode == ThemeMode.dark
-                                ? Icons.dark_mode
-                                : mode == ThemeMode.light
-                                    ? Icons.light_mode
-                                    : Icons.brightness_6,
-                          ),
-                          tooltip: 'Toggle Theme',
-                          onPressed: () {
-                            themeModeNotifier.value =
-                                mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+           
             ),
             body: _pages[currentIndex],
             bottomNavigationBar: BottomNavigationBar(

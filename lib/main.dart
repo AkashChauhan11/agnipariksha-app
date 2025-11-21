@@ -1,41 +1,16 @@
+import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/app_theme.dart';
 import 'core/routes/app_router.dart';
 import 'core/services/storage_service.dart';
-import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/dashboard/presentation/bloc/dashboard_bloc.dart';
-import 'features/dashboard/presentation/bloc/quiz_bloc.dart';
-import 'features/dashboard/domain/usecases/get_dashboard_data.dart';
-import 'features/dashboard/domain/usecases/get_available_quizzes.dart';
-import 'features/dashboard/domain/usecases/get_quiz_questions.dart';
-import 'features/dashboard/domain/usecases/save_quiz_result.dart';
-import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
-import 'features/dashboard/data/repositories/quiz_repository_impl.dart';
-import 'features/dashboard/data/data_sources/dashboard_remote_data_source.dart';
-import 'features/dashboard/data/data_sources/quiz_data_source.dart';
-import 'features/tag/presentation/cubit/tag_cubit.dart';
+
 import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
-  runApp(ThemeSwitcher(child: MyApp()));
-}
-
-class ThemeSwitcher extends InheritedWidget {
-  final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
-
-  ThemeSwitcher({super.key, required super.child});
-
-  static ThemeSwitcher of(BuildContext context) {
-    final ThemeSwitcher? result = context.dependOnInheritedWidgetOfExactType<ThemeSwitcher>();
-    assert(result != null, 'No ThemeSwitcher found in context');
-    return result!;
-  }
-
-  @override
-  bool updateShouldNotify(ThemeSwitcher oldWidget) => false;
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -43,136 +18,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeModeNotifier = ThemeSwitcher.of(context).themeModeNotifier;
     final appRouter = AppRouter(di.sl<StorageService>());
-    
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: themeModeNotifier,
-      builder: (context, mode, _) {
-        return MultiBlocProvider(
-          providers: [
-            // Auth Cubit
-            BlocProvider<AuthCubit>(
-              create: (context) => di.sl<AuthCubit>(),
-            ),
-            // Tag Cubit
-            BlocProvider<TagCubit>(
-              create: (context) => di.sl<TagCubit>()..fetchMainTags(),
-            ),
-            // Dashboard BLoC
-            BlocProvider<DashboardBloc>(
-              create: (context) => DashboardBloc(
-                GetDashboardData(
-                  DashboardRepositoryImpl(
-                    remoteDataSource: DashboardRemoteDataSource(),
-                  ),
-                ),
-              ),
-            ),
-            // Quiz BLoC
-            BlocProvider<QuizBloc>(
-              create: (context) => QuizBloc(
-                getAvailableQuizzes: GetAvailableQuizzes(
-                  QuizRepositoryImpl(
-                    QuizDataSourceImpl(),
-                  ),
-                ),
-                getQuizQuestions: GetQuizQuestions(
-                  QuizRepositoryImpl(
-                    QuizDataSourceImpl(),
-                  ),
-                ),
-                saveQuizResult: SaveQuizResult(
-                  QuizRepositoryImpl(
-                    QuizDataSourceImpl(),
-                  ),
-                ),
-              ),
-            ),
-          ],
-          child: MaterialApp.router(
-            title: 'Agni Pariksha',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: mode,
-            routerConfig: appRouter.router,
-            debugShowCheckedModeBanner: false,
-          ),
-        );
-      },
-    );
-  }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return BlocProvider<AuthCubit>(
+      create: (context) => di.sl<AuthCubit>(),
+      child: MaterialApp.router(
+        title: 'Agni Pariksha',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        routerConfig: appRouter.router,
+        debugShowCheckedModeBanner: false,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

@@ -1,30 +1,48 @@
-class ServerException implements Exception {
+import 'package:equatable/equatable.dart';
+
+class ServerException extends Equatable implements Exception {
   final String message;
+  final int statusCode;
   
-  ServerException(this.message);
+  const ServerException(this.message, this.statusCode);
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 
-class NetworkException implements Exception {
+class NetworkException extends Equatable implements Exception {
   final String message;
-  
-  NetworkException(this.message);
+  final int statusCode;
+  const NetworkException(this.message, this.statusCode);
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 
-class ValidationException implements Exception {
+class ValidationException extends Equatable implements Exception {
   final String message;
-  
-  ValidationException(this.message);
+  final int statusCode;
+  const ValidationException(this.message, this.statusCode);
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 
-class UnauthorizedException implements Exception {
+class UnauthorizedException extends Equatable implements Exception {
   final String message;
-  
-  UnauthorizedException(this.message);
+  final int statusCode;
+  const UnauthorizedException(this.message, this.statusCode);
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 
-class CacheException implements Exception {
+class CacheException extends Equatable implements Exception {
   final String message;
-  
-  CacheException(this.message);
+  final int statusCode;
+  const CacheException(this.message, this.statusCode);
+
+  @override
+  List<Object?> get props => [message, statusCode];
 }
 

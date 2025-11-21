@@ -1,4 +1,8 @@
+import 'package:agni_pariksha/core/routes/go_router_refresh_stream.dart';
+import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -7,12 +11,10 @@ import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
-import '../../features/tag/presentation/pages/main_tags_page.dart';
-import '../../features/tag/presentation/pages/subject_tags_page.dart';
-import '../../features/tag/presentation/pages/sub_tags_page.dart';
-import '../../features/tag/presentation/pages/create_quiz_page.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
+
+import '../../injection_container.dart' as di;
 
 class AppRouter {
   final StorageService storageService;
@@ -20,32 +22,64 @@ class AppRouter {
   AppRouter(this.storageService);
 
   late final GoRouter router = GoRouter(
-    initialLocation: RouteNames.login,
-    debugLogDiagnostics: true,
+    initialLocation: RouteNames.splash,
+
+    redirect: (context, state) {
+      final authState = context.watch<AuthCubit>().state;
+      final isOnSplashScreen = state.fullPath == RouteNames.splash;
+      final isOnLoginPage = state.fullPath == RouteNames.login;
+      final isOnDashboard = state.fullPath == RouteNames.dashboard;
+
+
+      // Handle loading and initial states
+      if (authState is AuthInitial || authState is AuthLoading) {
+        // Stay on the current screen (which should be the splash screen initially)
+        return null;
+      }
+
+      // Handle Authenticated state
+      if (authState is Authenticated) {
+        // If the user is authenticated and they are on the splash or login page,
+        // send them to the dashboard.
+        if (isOnSplashScreen || isOnLoginPage) {
+          return RouteNames.dashboard;
+        }
+        // Otherwise, they are likely already on the dashboard or another valid page, so stay put.
+        return null;
+      }
+
+      // Handle Unauthenticated state
+      if (authState is Unauthenticated) {
+        // If the user is unauthenticated and they are on the splash screen or dashboard,
+        // send them to the login page.
+        if (isOnSplashScreen || isOnDashboard) {
+          return RouteNames.login;
+        }
+        // Otherwise, they are already on a public page (login, register, forgot password, etc.), so stay put.
+        return null;
+      }
+
+      // Fallback case
+      return null;
+    },
     routes: [
       GoRoute(
-        path: RouteNames.home,
-        name: 'home',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const SplashPage(),
-        ),
+        path: RouteNames.splash,
+        name: 'splash',
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const SplashPage()),
       ),
       GoRoute(
         path: RouteNames.login,
         name: 'login',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const LoginPage(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: LoginPage()),
       ),
       GoRoute(
         path: RouteNames.register,
         name: 'register',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const RegisterPage(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const RegisterPage()),
       ),
       GoRoute(
         path: RouteNames.otpVerification,
@@ -54,19 +88,15 @@ class AppRouter {
           final email = state.extra as String?;
           return MaterialPage(
             key: state.pageKey,
-            child: OtpVerificationPage(
-              email: email ?? '',
-            ),
+            child: OtpVerificationPage(email: email ?? ''),
           );
         },
       ),
       GoRoute(
         path: RouteNames.forgotPassword,
         name: 'forgot-password',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const ForgotPasswordPage(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const ForgotPasswordPage()),
       ),
       GoRoute(
         path: RouteNames.resetPassword,
@@ -75,66 +105,15 @@ class AppRouter {
           final email = state.extra as String?;
           return MaterialPage(
             key: state.pageKey,
-            child: ResetPasswordPage(
-              email: email ?? '',
-            ),
+            child: ResetPasswordPage(email: email ?? ''),
           );
         },
       ),
       GoRoute(
         path: RouteNames.dashboard,
         name: 'dashboard',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const DashboardScreen(),
-        ),
-      ),
-      GoRoute(
-        path: RouteNames.mainTags,
-        name: 'main-tags',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const MainTagsPage(),
-        ),
-      ),
-      GoRoute(
-        path: RouteNames.subjectTags,
-        name: 'subject-tags',
-        pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          return MaterialPage(
-            key: state.pageKey,
-            child: SubjectTagsPage(
-              parentTagId: extra?['parentTagId'] as String?,
-              parentTagName: extra?['parentTagName'] as String?,
-            ),
-          );
-        },
-      ),
-      GoRoute(
-        path: RouteNames.subTags,
-        name: 'sub-tags',
-        pageBuilder: (context, state) {
-          final tagId = state.pathParameters['tagId']!;
-          final extra = state.extra as Map<String, dynamic>?;
-          return MaterialPage(
-            key: state.pageKey,
-            child: SubTagsPage(
-              tagId: tagId,
-              tagName: extra?['tagName'] as String? ?? 'Tag',
-              parentTagId: extra?['parentTagId'] as String?,
-              parentTagName: extra?['parentTagName'] as String?,
-            ),
-          );
-        },
-      ),
-      GoRoute(
-        path: RouteNames.createQuiz,
-        name: 'create-quiz',
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const CreateQuizPage(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const DashboardScreen()),
       ),
     ],
     errorPageBuilder: (context, state) => MaterialPage(
@@ -164,4 +143,3 @@ class AppRouter {
     ),
   );
 }
-

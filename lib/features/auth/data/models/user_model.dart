@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:agni_pariksha/utils/typedef.dart';
+
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -12,20 +16,48 @@ class UserModel extends User {
     required super.isVerified,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+
+  factory UserModel.fromJson(String json) {
+    return UserModel.fromMap(jsonDecode(json) as DataMap);
+  }
+
+  factory UserModel.fromMap(DataMap map) {
     return UserModel(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
-      phone: json['phone'] as String?,
-      role: json['role'] as String,
-      isActive: json['isActive'] as bool? ?? true,
-      isVerified: json['isVerified'] as bool? ?? false,
+      id: map['id'] as String,
+      email: map['email'] as String,
+      firstName: map['firstName'] as String,
+      lastName: map['lastName'] as String,
+      phone: map['phone'] as String?,
+      role: map['role'] as String,
+      isActive: map['isActive'] as bool? ?? true,
+      isVerified: map['isVerified'] as bool? ?? false,
     );
   }
 
-  Map<String, dynamic> toJson() {
+
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? role,
+    bool? isActive,
+    bool? isVerified,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      isActive: isActive ?? this.isActive,
+      isVerified: isVerified ?? this.isVerified,
+    );
+  }
+
+  DataMap toMap() {
     return {
       'id': id,
       'email': email,
@@ -36,6 +68,10 @@ class UserModel extends User {
       'isActive': isActive,
       'isVerified': isVerified,
     };
+  }
+
+  String toJson() {
+    return jsonEncode(toMap());
   }
 
   User toEntity() {

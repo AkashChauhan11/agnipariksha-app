@@ -113,29 +113,29 @@ class ApiService {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException('Connection timeout. Please check your internet connection.');
+        return NetworkException('Connection timeout. Please check your internet connection.', 504);
       
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         final message = error.response?.data['message'] ?? 'Something went wrong';
         
         if (statusCode == 401) {
-          return UnauthorizedException(message);
+          return UnauthorizedException(message, statusCode!);
         } else if (statusCode == 400) {
-          return ValidationException(message);
+          return ValidationException(message, statusCode!);
         } else if (statusCode != null && statusCode >= 500) {
-          return ServerException('Server error. Please try again later.');
+          return ServerException('Server error. Please try again later.', statusCode);
         }
-        return ServerException(message);
+        return ServerException(message, statusCode!);
       
       case DioExceptionType.cancel:
-        return NetworkException('Request cancelled');
+        return NetworkException('Request cancelled', 500);
       
       case DioExceptionType.connectionError:
-        return NetworkException('No internet connection. Please check your network.');
+        return NetworkException('No internet connection. Please check your network.', 500);
       
       default:
-        return NetworkException('Unexpected error occurred');
+        return NetworkException('Unexpected error occurred', 500);
     }
   }
 }

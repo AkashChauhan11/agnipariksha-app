@@ -1,3 +1,4 @@
+import 'package:agni_pariksha/features/auth/domain/usecase/register.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,13 +12,7 @@ import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 
-// Tag
-import 'features/tag/data/data_sources/tag_remote_data_source.dart';
-import 'features/tag/data/repositories/tag_repository_impl.dart';
-import 'features/tag/domain/repositories/tag_repository.dart';
-import 'features/tag/domain/usecases/get_tags.dart';
-import 'features/tag/domain/usecases/get_sub_tags.dart';
-import 'features/tag/presentation/cubit/tag_cubit.dart';
+
 
 final sl = GetIt.instance;
 
@@ -25,16 +20,6 @@ Future<void> init() async {
   // ========================
   // Features - Auth
   // ========================
-
-  // Cubit
-  sl.registerFactory(
-    () => AuthCubit(authRepository: sl()),
-  );
-
-  // Repository
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remoteDataSource: sl()),
-  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -44,31 +29,19 @@ Future<void> init() async {
     ),
   );
 
-  // ========================
-  // Features - Tag
-  // ========================
-
-  // Cubit
-  sl.registerFactory(
-    () => TagCubit(
-      getTags: sl(),
-      getSubTags: sl(),
-    ),
+  // Repository
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
 
   // Use cases
-  sl.registerLazySingleton(() => GetTags(sl()));
-  sl.registerLazySingleton(() => GetSubTags(sl()));
+  sl.registerLazySingleton(() => RegisterUsecase(sl()));
 
-  // Repository
-  sl.registerLazySingleton<TagRepository>(
-    () => TagRepositoryImpl(remoteDataSource: sl()),
+  // Cubit
+  sl.registerFactory(
+    () => AuthCubit(registerUsecase: sl(), authRepository: sl()),
   );
 
-  // Data sources
-  sl.registerLazySingleton<TagRemoteDataSource>(
-    () => TagRemoteDataSourceImpl(apiService: sl()),
-  );
 
   // ========================
   // Core

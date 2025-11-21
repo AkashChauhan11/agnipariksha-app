@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:agni_pariksha/utils/typedef.dart';
+
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/services/api_service.dart';
@@ -6,7 +8,7 @@ import '../../../../core/services/storage_service.dart';
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<Map<String, dynamic>> register({
+  Future<DataMap> register({
     required String firstName,
     required String lastName,
     required String email,
@@ -14,25 +16,25 @@ abstract class AuthRemoteDataSource {
     String? phone,
   });
 
-  Future<Map<String, dynamic>> login({
+  Future<DataMap> login({
     required String email,
     required String password,
   });
 
-  Future<Map<String, dynamic>> verifyOtp({
+  Future<DataMap> verifyOtp({
     required String email,
     required String otp,
   });
 
-  Future<Map<String, dynamic>> resendOtp({
+  Future<DataMap> resendOtp({
     required String email,
   });
 
-  Future<Map<String, dynamic>> forgotPassword({
+  Future<DataMap> forgotPassword({
     required String email,
   });
 
-  Future<Map<String, dynamic>> resetPassword({
+  Future<DataMap> resetPassword({
     required String email,
     required String otp,
     required String newPassword,
@@ -191,13 +193,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final userData = await storageService.getUserData();
       
       if (userData == null) {
-        throw CacheException('No user data found');
+        throw CacheException('No user data found', 404);
       }
 
-      final userJson = jsonDecode(userData) as Map<String, dynamic>;
-      return UserModel.fromJson(userJson);
+      final userJson = UserModel.fromJson(userData) as DataMap;
+      return UserModel.fromMap(userJson);
     } catch (e) {
-      throw CacheException('Failed to get user data');
+      throw CacheException('Failed to get user data', 500);
     }
   }
 
@@ -259,7 +261,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       await storageService.clearAll();
     } catch (e) {
-      throw CacheException('Failed to logout');
+      throw CacheException('Failed to logout', 500);
     }
   }
 }

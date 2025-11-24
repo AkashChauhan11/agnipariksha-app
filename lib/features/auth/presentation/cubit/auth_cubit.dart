@@ -1,15 +1,35 @@
 import 'package:agni_pariksha/features/auth/domain/usecase/register.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/login.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/verify_otp.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/user.dart';
-import '../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final RegisterUsecase registerUsecase;
+  final LoginUsecase loginUsecase;
+  final VerifyOtpUsecase verifyOtpUsecase;
+  final ResendOtpUsecase resendOtpUsecase;
+  final ForgotPasswordUsecase forgotPasswordUsecase;
+  final ResetPasswordUsecase resetPasswordUsecase;
+  final GetCurrentUserUsecase getCurrentUserUsecase;
+  final LogoutUsecase logoutUsecase;
 
-  AuthCubit({required this.registerUsecase, required this.authRepository})
-    : super(AuthInitial());
-  final AuthRepository authRepository;
+  AuthCubit({
+    required this.registerUsecase,
+    required this.loginUsecase,
+    required this.verifyOtpUsecase,
+    required this.resendOtpUsecase,
+    required this.forgotPasswordUsecase,
+    required this.resetPasswordUsecase,
+    required this.getCurrentUserUsecase,
+    required this.logoutUsecase,
+  }) : super(AuthInitial());
 
   // Register user
   Future<void> register({
@@ -43,7 +63,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login({required String email, required String password}) async {
     emit(AuthLoading());
 
-    final result = await authRepository.login(email: email, password: password);
+    final result = await loginUsecase(
+      LoginParams(email: email, password: password),
+    );
 
     result.fold((failure) => emit(AuthError(message: failure.message)), (data) {
       // Check if response indicates unverified user
@@ -79,7 +101,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> verifyOtp({required String email, required String otp}) async {
     emit(AuthLoading());
 
-    final result = await authRepository.verifyOtp(email: email, otp: otp);
+    final result = await verifyOtpUsecase(
+      VerifyOtpParams(email: email, otp: otp),
+    );
 
     result.fold((failure) => emit(AuthError(message: failure.message)), (data) {
       if (data['accessToken'] != null && data['user'] != null) {
@@ -107,7 +131,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> resendOtp({required String email}) async {
     emit(AuthLoading());
 
-    final result = await authRepository.resendOtp(email: email);
+    final result = await resendOtpUsecase(
+      ResendOtpParams(email: email),
+    );
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
@@ -119,7 +145,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> forgotPassword({required String email}) async {
     emit(AuthLoading());
 
-    final result = await authRepository.forgotPassword(email: email);
+    final result = await forgotPasswordUsecase(
+      ForgotPasswordParams(email: email),
+    );
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
@@ -137,10 +165,12 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
 
-    final result = await authRepository.resetPassword(
-      email: email,
-      otp: otp,
-      newPassword: newPassword,
+    final result = await resetPasswordUsecase(
+      ResetPasswordParams(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      ),
     );
 
     result.fold(
@@ -151,21 +181,19 @@ class AuthCubit extends Cubit<AuthState> {
 
   // Check authentication status
   Future<void> checkAuthStatus() async {
-    final result = await authRepository.getCurrentUser();
+    final result = await getCurrentUserUsecase();
 
-    emit(Unauthenticated());
-
-    // result.fold(
-    //   (failure) => emit(Unauthenticated()),
-    //   (user) => emit(Authenticated(user: user)),
-    // );
+    result.fold(
+      (failure) => emit(Unauthenticated()),
+      (user) => emit(Authenticated(user: user)),
+    );
   }
 
   // Logout
   Future<void> logout() async {
     emit(AuthLoading());
 
-    final result = await authRepository.logout();
+    final result = await logoutUsecase();
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),

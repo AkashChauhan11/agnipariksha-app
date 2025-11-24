@@ -1,4 +1,11 @@
 import 'package:agni_pariksha/features/auth/domain/usecase/register.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/login.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/verify_otp.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,10 +43,26 @@ Future<void> init() async {
 
   // Use cases
   sl.registerLazySingleton(() => RegisterUsecase(sl()));
+  sl.registerLazySingleton(() => LoginUsecase(sl()));
+  sl.registerLazySingleton(() => VerifyOtpUsecase(sl()));
+  sl.registerLazySingleton(() => ResendOtpUsecase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordUsecase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUsecase(sl()));
+  sl.registerLazySingleton(() => GetCurrentUserUsecase(sl()));
+  sl.registerLazySingleton(() => LogoutUsecase(sl()));
 
   // Cubit
   sl.registerFactory(
-    () => AuthCubit(registerUsecase: sl(), authRepository: sl()),
+    () => AuthCubit(
+      registerUsecase: sl(),
+      loginUsecase: sl(),
+      verifyOtpUsecase: sl(),
+      resendOtpUsecase: sl(),
+      forgotPasswordUsecase: sl(),
+      resetPasswordUsecase: sl(),
+      getCurrentUserUsecase: sl(),
+      logoutUsecase: sl(),
+    ),
   );
 
 

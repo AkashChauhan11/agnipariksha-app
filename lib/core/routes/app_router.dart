@@ -2,7 +2,6 @@ import 'package:agni_pariksha/core/routes/go_router_refresh_stream.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -14,18 +13,18 @@ import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
 
-import '../../injection_container.dart' as di;
-
 class AppRouter {
   final StorageService storageService;
+  final AuthCubit authCubit;
 
-  AppRouter(this.storageService);
+  AppRouter(this.storageService, this.authCubit);
 
   late final GoRouter router = GoRouter(
     initialLocation: RouteNames.splash,
+    refreshListenable: GoRouterRefreshStream(authCubit.stream),
 
     redirect: (context, state) {
-      final authState = context.watch<AuthCubit>().state;
+      final authState = authCubit.state;
       final isOnSplashScreen = state.fullPath == RouteNames.splash;
       final isOnLoginPage = state.fullPath == RouteNames.login;
       final isOnDashboard = state.fullPath == RouteNames.dashboard;

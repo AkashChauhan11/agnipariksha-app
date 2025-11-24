@@ -18,10 +18,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appRouter = AppRouter(di.sl<StorageService>());
+    final authCubit = di.sl<AuthCubit>();
+    final appRouter = AppRouter(di.sl<StorageService>(), authCubit);
 
-    return BlocProvider<AuthCubit>(
-      create: (context) => di.sl<AuthCubit>(),
+    return BlocProvider<AuthCubit>.value(
+      value: authCubit,
       child: MaterialApp.router(
         title: 'Agni Pariksha',
         theme: AppTheme.lightTheme,

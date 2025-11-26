@@ -5,7 +5,9 @@ import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/validate_session.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
+import 'package:agni_pariksha/core/services/storage_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/user.dart';
 import 'auth_state.dart';
@@ -18,7 +20,9 @@ class AuthCubit extends Cubit<AuthState> {
   final ForgotPasswordUsecase forgotPasswordUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
   final GetCurrentUserUsecase getCurrentUserUsecase;
+  final ValidateSessionUsecase validateSessionUsecase;
   final LogoutUsecase logoutUsecase;
+  final StorageService storageService;
 
   AuthCubit({
     required this.registerUsecase,
@@ -28,7 +32,9 @@ class AuthCubit extends Cubit<AuthState> {
     required this.forgotPasswordUsecase,
     required this.resetPasswordUsecase,
     required this.getCurrentUserUsecase,
+    required this.validateSessionUsecase,
     required this.logoutUsecase,
+    required this.storageService,
   }) : super(AuthInitial());
 
   // Register user
@@ -179,14 +185,38 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  // Check authentication status
+  // Check authentication status - validates token with backend
   Future<void> checkAuthStatus() async {
-    final result = await getCurrentUserUsecase();
+    // First check if we have token and login flag
+    final isLoggedIn = await storageService.isLoggedIn();
+    final accessToken = await storageService.getAccessToken();
+    
+    if (!isLoggedIn || accessToken == null || accessToken.isEmpty) {
+      emit(Unauthenticated());
+      return;
+    }
+
+    // Validate token with backend
+    emit(AuthLoading());
+    
+    final result = await validateSessionUsecase();
 
     result.fold(
-      (failure) => emit(Unauthenticated()),
-      (user) => emit(Authenticated(user: user)),
+      (failure) {
+        // Token is invalid or expired, clear session
+        _clearSession();
+        emit(Unauthenticated());
+      },
+      (user) {
+        // Token is valid, user is authenticated
+        emit(Authenticated(user: user));
+      },
     );
+  }
+
+  // Clear session helper
+  void _clearSession() {
+    storageService.clearAll();
   }
 
   // Logout
@@ -196,8 +226,15 @@ class AuthCubit extends Cubit<AuthState> {
     final result = await logoutUsecase();
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
-      (_) => emit(LogoutSuccess()),
+      (failure) {
+        // Even if logout fails, clear local session
+        _clearSession();
+        emit(LogoutSuccess());
+      },
+      (_) {
+        _clearSession();
+        emit(LogoutSuccess());
+      },
     );
   }
 }

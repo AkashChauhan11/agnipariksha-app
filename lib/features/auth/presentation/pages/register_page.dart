@@ -1,10 +1,16 @@
 import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:agni_pariksha/common/widgets/custom_text_field.dart';
+import 'package:agni_pariksha/common/widgets/custom_searchable_dropdown.dart';
+import 'package:agni_pariksha/features/location/presentation/cubit/location_cubit.dart';
+import 'package:agni_pariksha/features/location/presentation/cubit/location_state.dart' as LocationCubitState;
+import 'package:agni_pariksha/features/location/domain/entities/state.dart' as LocationEntity;
+import 'package:agni_pariksha/features/location/domain/entities/city.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
+import '../../../../injection_container.dart' as di;
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -23,7 +29,21 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  
+  LocationEntity.State? _selectedState;
+  City? _selectedCity;
 
+
+  @override
+  void initState() {
+    super.initState();
+
+    // safe call (no async gap problem)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<LocationCubit>().initializeIndia();
+    });
+  }
 
 
   @override
@@ -53,9 +73,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocConsumer<AuthCubit, AuthState>(
+    return    Scaffold(
+        backgroundColor: Colors.white,
+        body:  BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is RegistrationSuccess) {
             //Registration successful, show snackbar and redirect to OTP verification page
@@ -161,6 +181,78 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: 'Phone (Optional)',
                         prefixIcon: Icons.phone_outlined,
                         keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 16),
+                      // State dropdown
+                      BlocBuilder<LocationCubit, LocationCubitState.LocationState>(
+                        builder: (context, locationState) {
+                          List<LocationEntity.State> states = [];
+                          bool isLoadingStates = false;
+                          
+                          if (locationState is LocationCubitState.StatesLoaded) {
+                            states = locationState.states;
+                          } else if (locationState is LocationCubitState.LocationLoading) {
+                            isLoadingStates = true;
+                          }
+                          
+                          return CustomSearchableDropdown<LocationEntity.State>(
+                            hintText: 'Select State',
+                            prefixIcon: Icons.location_on_outlined,
+                            items: states,
+                            displayItem: (state) => state.name,
+                            selectedItem: _selectedState,
+                            isLoading: isLoadingStates,
+                            onChanged: (state) {
+                              setState(() {
+                                _selectedState = state;
+                                _selectedCity = null; // Reset city when state changes
+                              });
+                              if (state != null) {
+                                context.read<LocationCubit>().loadCitiesByState(state.id);
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select a state';
+                              }
+                              return null;
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // City dropdown
+                      BlocBuilder<LocationCubit, LocationCubitState.LocationState>(
+                        builder: (context, locationState) {
+                          List<City> cities = [];
+                          bool isLoadingCities = false;
+                          
+                          if (locationState is LocationCubitState.CitiesLoaded) {
+                            cities = locationState.cities;
+                          } else if (locationState is LocationCubitState.LocationLoading && _selectedState != null) {
+                            isLoadingCities = true;
+                          }
+                          
+                          return CustomSearchableDropdown<City>(
+                            hintText: 'Select City',
+                            prefixIcon: Icons.location_city_outlined,
+                            items: cities,
+                            displayItem: (city) => city.name,
+                            selectedItem: _selectedCity,
+                            isLoading: isLoadingCities,
+                            onChanged: (city) {
+                              setState(() {
+                                _selectedCity = city;
+                              });
+                            },
+                            validator: (value) {
+                              if (_selectedState != null && value == null) {
+                                return 'Please select a city';
+                              }
+                              return null;
+                            },
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       // Password field
@@ -279,8 +371,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           );
         },
-      ),
-    );
+        ),
+      );
   }
 }
 

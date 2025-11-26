@@ -42,6 +42,8 @@ abstract class AuthRemoteDataSource {
 
   Future<UserModel> getCurrentUser();
   
+  Future<UserModel> getProfile();
+  
   Future<void> logout();
 }
 
@@ -190,16 +192,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> getCurrentUser() async {
     try {
+      // First try to get from cache
       final userData = await storageService.getUserData();
       
-      if (userData == null) {
-        throw CacheException('No user data found', 404);
+      if (userData != null) {
+        try {
+          final userJson = jsonDecode(userData) as DataMap;
+          return UserModel.fromMap(userJson);
+        } catch (e) {
+          // If cache is corrupted, fetch from backend
+          return await getProfile();
+        }
       }
-
-      final userJson = UserModel.fromJson(userData) as DataMap;
-      return UserModel.fromMap(userJson);
+      
+      // If no cache, fetch from backend
+      return await getProfile();
     } catch (e) {
       throw CacheException('Failed to get user data', 500);
+    }
+  }
+
+  @override
+  Future<UserModel> getProfile() async {
+    try {
+      final response = await apiService.get(ApiConstants.getProfile);
+      
+      final responseData = response.data as Map<String, dynamic>;
+      final data = responseData['data'] as Map<String, dynamic>? ?? responseData;
+      
+      final userModel = UserModel.fromMap(data);
+      
+      // Save updated user data to cache
+      await storageService.saveUserData(userModel.toJson());
+      
+      return userModel;
+    } catch (e) {
+      rethrow;
     }
   }
 

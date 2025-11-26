@@ -1,7 +1,8 @@
 import 'package:agni_pariksha/core/routes/go_router_refresh_stream.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
+import 'package:agni_pariksha/features/location/presentation/cubit/location_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -13,54 +14,12 @@ import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
 
+import '../../injection_container.dart' as di;
+
 class AppRouter {
-  final StorageService storageService;
-  final AuthCubit authCubit;
-
-  AppRouter(this.storageService, this.authCubit);
-
   late final GoRouter router = GoRouter(
     initialLocation: RouteNames.splash,
-    refreshListenable: GoRouterRefreshStream(authCubit.stream),
-
-    redirect: (context, state) {
-      final authState = authCubit.state;
-      final isOnSplashScreen = state.fullPath == RouteNames.splash;
-      final isOnLoginPage = state.fullPath == RouteNames.login;
-      final isOnDashboard = state.fullPath == RouteNames.dashboard;
-
-
-      // Handle loading and initial states
-      if (authState is AuthInitial || authState is AuthLoading) {
-        // Stay on the current screen (which should be the splash screen initially)
-        return null;
-      }
-
-      // Handle Authenticated state
-      if (authState is Authenticated) {
-        // If the user is authenticated and they are on the splash or login page,
-        // send them to the dashboard.
-        if (isOnSplashScreen || isOnLoginPage) {
-          return RouteNames.dashboard;
-        }
-        // Otherwise, they are likely already on the dashboard or another valid page, so stay put.
-        return null;
-      }
-
-      // Handle Unauthenticated state
-      if (authState is Unauthenticated) {
-        // If the user is unauthenticated and they are on the splash screen or dashboard,
-        // send them to the login page.
-        if (isOnSplashScreen || isOnDashboard) {
-          return RouteNames.login;
-        }
-        // Otherwise, they are already on a public page (login, register, forgot password, etc.), so stay put.
-        return null;
-      }
-
-      // Fallback case
-      return null;
-    },
+    // refreshListenable: GoRouterRefreshStream(authCubit.stream),
     routes: [
       GoRoute(
         path: RouteNames.splash,
@@ -77,9 +36,11 @@ class AppRouter {
       GoRoute(
         path: RouteNames.register,
         name: 'register',
-        pageBuilder: (context, state) =>
-            MaterialPage(key: state.pageKey, child: const RegisterPage()),
+        pageBuilder: (context, state) {
+          return MaterialPage(key: state.pageKey, child: const RegisterPage());
+        },
       ),
+
       GoRoute(
         path: RouteNames.otpVerification,
         name: 'otp-verification',

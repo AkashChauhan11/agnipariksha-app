@@ -36,6 +36,8 @@ abstract class AuthRepository {
 
   ResultFuture<User> getCurrentUser();
   
+  ResultFuture<User> getProfile();
+  
   ResultVoid logout();
 }
 

@@ -148,10 +148,32 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final userModel = await remoteDataSource.getCurrentUser();
       return Right(userModel.toEntity());
+    } on UnauthorizedException catch (e) {
+      // Token is invalid, clear session
+      await remoteDataSource.logout();
+      return Left(UnauthorizedFailure(e.message, e.statusCode));
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message, e.statusCode));
     } catch (e) {
       return Left(CacheFailure('Failed to get user', 500));
+    }
+  }
+
+  @override
+  ResultFuture<User> getProfile() async {
+    try {
+      final userModel = await remoteDataSource.getProfile();
+      return Right(userModel.toEntity());
+    } on UnauthorizedException catch (e) {
+      // Token is invalid, clear session
+      await remoteDataSource.logout();
+      return Left(UnauthorizedFailure(e.message, e.statusCode));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure('Failed to get profile', 500));
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:agni_pariksha/common/widgets/custom_text_field.dart';
+import 'package:agni_pariksha/core/routes/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -24,8 +25,13 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     // Check if user is already logged in
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthCubit>().checkAuthStatus();
+      _checkAuthStatus();
     });
+  }
+
+  Future<void> _checkAuthStatus() async {
+    // Check authentication status (validates token with backend)
+    context.read<AuthCubit>().checkAuthStatus();
   }
 
   @override
@@ -52,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state is Authenticated) {
             // User is already logged in, redirect to dashboard
-            context.go('/dashboard');
+            context.go(RouteNames.dashboard);
           } else if (state is LoginSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -64,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
             // Small delay to show the success message
             Future.delayed(const Duration(milliseconds: 500), () {
               if (context.mounted) {
-                context.go('/dashboard');
+                context.go(RouteNames.dashboard);
               }
             });
           } else if (state is LoginUnverified) {
@@ -75,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                 duration: const Duration(seconds: 4),
               ),
             );
-            context.go('/otp-verification', extra: state.email);
+            context.go(RouteNames.otpVerification, extra: state.email);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

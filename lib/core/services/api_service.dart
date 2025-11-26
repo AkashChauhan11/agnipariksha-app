@@ -27,6 +27,11 @@ class ApiService {
           return handler.next(options);
         },
         onError: (error, handler) async {
+          // Handle 401 Unauthorized - token expired or invalid
+          if (error.response?.statusCode == 401) {
+            // Clear session on unauthorized error
+            await _storageService.clearAll();
+          }
           return handler.next(error);
         },
       ),

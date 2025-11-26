@@ -5,7 +5,10 @@ import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/validate_session.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
+import 'package:agni_pariksha/features/location/domain/usecase/get_states_by_country.dart';
+import 'package:agni_pariksha/features/location/domain/usecase/get_cities_by_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +21,12 @@ import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
+
+// Location
+import 'features/location/data/datasources/location_remote_data_source.dart';
+import 'features/location/data/repositories/location_repository_impl.dart';
+import 'features/location/domain/repositories/location_repository.dart';
+import 'features/location/presentation/cubit/location_cubit.dart';
 
 
 
@@ -49,6 +58,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ForgotPasswordUsecase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUsecase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUsecase(sl()));
+  sl.registerLazySingleton(() => ValidateSessionUsecase(sl()));
   sl.registerLazySingleton(() => LogoutUsecase(sl()));
 
   // Cubit
@@ -61,10 +71,37 @@ Future<void> init() async {
       forgotPasswordUsecase: sl(),
       resetPasswordUsecase: sl(),
       getCurrentUserUsecase: sl(),
+      validateSessionUsecase: sl(),
       logoutUsecase: sl(),
+      storageService: sl(),
     ),
   );
 
+  // ========================
+  // Features - Location
+  // ========================
+
+  // Data sources
+  sl.registerLazySingleton<LocationRemoteDataSource>(
+    () => LocationRemoteDataSourceImpl(apiService: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<LocationRepository>(
+    () => LocationRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetStatesByCountryUsecase(sl()));
+  sl.registerLazySingleton(() => GetCitiesByStateUsecase(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => LocationCubit(
+      getStatesByCountryUsecase: sl(),
+      getCitiesByStateUsecase: sl(),
+    ),
+  );
 
   // ========================
   // Core

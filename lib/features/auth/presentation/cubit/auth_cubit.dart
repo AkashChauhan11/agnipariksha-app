@@ -43,7 +43,10 @@ class AuthCubit extends Cubit<AuthState> {
     required String lastName,
     required String email,
     required String password,
+
     String? phone,
+    String? state,
+    String? city,
   }) async {
     emit(AuthLoading());
 
@@ -54,6 +57,8 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
         phone: phone,
+        state: state,
+        city: city,
       ),
     );
 
@@ -187,6 +192,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   // Check authentication status - validates token with backend
   Future<void> checkAuthStatus() async {
+
+    // emit(Unauthenticated());
+
     // First check if we have token and login flag
     final isLoggedIn = await storageService.isLoggedIn();
     final accessToken = await storageService.getAccessToken();

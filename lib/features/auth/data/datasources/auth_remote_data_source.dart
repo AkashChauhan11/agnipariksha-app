@@ -14,6 +14,8 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
     String? phone,
+    String? state,
+    String? city,
   });
 
   Future<DataMap> login({
@@ -63,6 +65,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
     String? phone,
+    String? state,
+    String? city,
   }) async {
     try {
       final response = await apiService.post(
@@ -73,6 +77,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'email': email,
           'password': password,
           if (phone != null && phone.isNotEmpty) 'phone': phone,
+          if (state != null && state.isNotEmpty) 'stateId': state,
+          if (city != null && city.isNotEmpty) 'cityId': city,
         },
       );
 

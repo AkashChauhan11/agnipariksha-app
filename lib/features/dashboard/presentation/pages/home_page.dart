@@ -1,3 +1,5 @@
+import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -25,13 +27,32 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Hi, User!',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                      ),
-                    ),
+                    child: BlocBuilder<AuthCubit, AuthState>(
+  builder: (context, state) {
+    if (state is Authenticated) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Hi,Welcome to Agni Pariksha"),
+            Text("Name: ${state.user.firstName} ${state.user.lastName}"),
+            Text("Email: ${state.user.email}"),
+            Text("Phone: ${state.user.phone}"),
+            Text("Ui: ${state.user.id}"),
+            
+          ],
+        ),
+      );
+    }
+    return Text("Not logged in");
+  },
+)
                   ),
                 ),
                 const SizedBox(height: 12),

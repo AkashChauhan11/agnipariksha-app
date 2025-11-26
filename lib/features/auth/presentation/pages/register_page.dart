@@ -1,16 +1,15 @@
 import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:agni_pariksha/common/widgets/custom_text_field.dart';
-import 'package:agni_pariksha/common/widgets/custom_searchable_dropdown.dart';
 import 'package:agni_pariksha/features/location/presentation/cubit/location_cubit.dart';
 import 'package:agni_pariksha/features/location/presentation/cubit/location_state.dart' as LocationCubitState;
 import 'package:agni_pariksha/features/location/domain/entities/state.dart' as LocationEntity;
 import 'package:agni_pariksha/features/location/domain/entities/city.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
-import '../../../../injection_container.dart' as di;
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -37,11 +36,17 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
+    debugPrint('RegisterPage: initState called');
 
     // safe call (no async gap problem)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      context.read<LocationCubit>().initializeIndia();
+      if (!mounted) {
+        debugPrint('RegisterPage: Widget not mounted, skipping initialization');
+        return;
+      } else {
+        debugPrint('RegisterPage: Widget mounted, initializing India states');
+        context.read<LocationCubit>().initializeIndia();
+      }
     });
   }
 
@@ -59,6 +64,30 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
+      // Additional validation for state and city
+      if (_selectedState == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a state'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+      
+      if (_selectedCity == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a city'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+      
+      debugPrint('state: ${_selectedState?.id}');
+      debugPrint('city: ${_selectedCity?.id}');
+      
       context.read<AuthCubit>().register(
             firstName: _firstNameController.text.trim(),
             lastName: _lastNameController.text.trim(),
@@ -67,6 +96,8 @@ class _RegisterPageState extends State<RegisterPage> {
             phone: _phoneController.text.trim().isEmpty
                 ? null
                 : _phoneController.text.trim(),
+            state: _selectedState!.id,
+            city: _selectedCity!.id,
           );
     }
   }
@@ -191,69 +222,215 @@ class _RegisterPageState extends State<RegisterPage> {
                           
                           if (locationState is LocationCubitState.StatesLoaded) {
                             states = locationState.states;
+                            print(states);
+                            isLoadingStates = false;
+
                           } else if (locationState is LocationCubitState.LocationLoading) {
                             isLoadingStates = true;
                           }
                           
-                          return CustomSearchableDropdown<LocationEntity.State>(
-                            hintText: 'Select State',
-                            prefixIcon: Icons.location_on_outlined,
-                            items: states,
-                            displayItem: (state) => state.name,
-                            selectedItem: _selectedState,
-                            isLoading: isLoadingStates,
-                            onChanged: (state) {
-                              setState(() {
-                                _selectedState = state;
-                                _selectedCity = null; // Reset city when state changes
-                              });
-                              if (state != null) {
-                                context.read<LocationCubit>().loadCitiesByState(state.id);
-                              }
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select a state';
-                              }
-                              return null;
-                            },
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.primary.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: DropdownSearch<LocationEntity.State>(
+                              key: const ValueKey('state_dropdown'),
+                              mode: Mode.form,
+                              items: (filter, loadProps) => isLoadingStates ? [] : states,
+
+                              compareFn: (item, value) => item.id == value.id,
+                              itemAsString: (item) => item.name,
+                              // enabled: !isLoadingStates,
+                              decoratorProps: DropDownDecoratorProps(
+                                decoration: InputDecoration(
+                                  hintText: 'Select State',
+                                  hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                  
+                                  prefixIcon: Icon(
+                                    Icons.location_on_outlined,
+                                    color: AppColors.primary,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 16,
+                                  ),
+                                ),
+                              ),
+                              selectedItem: _selectedState,
+                              popupProps: PopupProps.modalBottomSheet(
+
+
+                                
+                                showSelectedItems: true,
+                                fit: FlexFit.tight,
+                                showSearchBox: true,
+                                searchFieldProps: TextFieldProps(
+                                  decoration: InputDecoration(
+                                    hintText: 'Search',
+                                    hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                                itemBuilder: (context, item, isDisabled, isSelected) => Container(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(item.name, style: const TextStyle(color: AppColors.primary,fontSize: 15),),
+                                ),
+                                modalBottomSheetProps: ModalBottomSheetProps(
+
+
+                                  shape: BeveledRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  barrierColor: Colors.black.withOpacity(0.5),
+
+
+                                ),
+                              ),
+                              onChanged: (state) {
+                                debugPrint('State changed: ${state?.name}, id: ${state?.id}');
+                                setState(() {
+                                  _selectedState = state;
+                                  _selectedCity = null; // Reset city when state changes
+                                });
+                                if (state != null) {
+                                  context.read<LocationCubit>().loadCitiesByState(state.id);
+                                }
+                                debugPrint('_selectedState after update: ${_selectedState?.id}');
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select a state';
+                                }
+                                return null;
+                              },
+                            ),
                           );
                         },
                       ),
                       const SizedBox(height: 16),
                       // City dropdown
-                      BlocBuilder<LocationCubit, LocationCubitState.LocationState>(
-                        builder: (context, locationState) {
-                          List<City> cities = [];
-                          bool isLoadingCities = false;
-                          
-                          if (locationState is LocationCubitState.CitiesLoaded) {
-                            cities = locationState.cities;
-                          } else if (locationState is LocationCubitState.LocationLoading && _selectedState != null) {
-                            isLoadingCities = true;
-                          }
-                          
-                          return CustomSearchableDropdown<City>(
-                            hintText: 'Select City',
-                            prefixIcon: Icons.location_city_outlined,
-                            items: cities,
-                            displayItem: (city) => city.name,
-                            selectedItem: _selectedCity,
-                            isLoading: isLoadingCities,
-                            onChanged: (city) {
-                              setState(() {
-                                _selectedCity = city;
-                              });
-                            },
-                            validator: (value) {
-                              if (_selectedState != null && value == null) {
-                                return 'Please select a city';
-                              }
-                              return null;
-                            },
-                          );
-                        },
-                      ),
+                      if (_selectedState != null)
+                        BlocBuilder<LocationCubit, LocationCubitState.LocationState>(
+                          builder: (context, locationState) {
+                            List<City> cities = [];
+                            bool isLoadingCities = false;
+                            
+                            if (locationState is LocationCubitState.CitiesLoaded) {
+                              cities = locationState.cities;
+                            } else if (locationState is LocationCubitState.LocationLoading && _selectedState != null) {
+                              isLoadingCities = true;
+                            }
+                            
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: DropdownSearch<City>(
+                                key: const ValueKey('city_dropdown'),
+                                mode: Mode.form,
+
+                                items: (filter, loadProps) => isLoadingCities ? [] : cities,
+                                compareFn: (item, value) => item.id == value.id,
+
+                                itemAsString: (item) => item.name,
+                                decoratorProps: DropDownDecoratorProps(
+                                  decoration: InputDecoration(
+                                    hintText: 'Select City',
+                                    hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                    prefixIcon: Icon(
+                                      Icons.location_city_outlined,
+                                      color: AppColors.primary,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                                selectedItem: _selectedCity,
+                                filterFn: (item, query) => item.name.toLowerCase().contains(query.toLowerCase()),
+                                popupProps: PopupProps.modalBottomSheet(
+                                  // containerBuilder: (context, popupWidget) => 
+                                  // Container(
+                                  //   constraints: BoxConstraints(
+                                  //     maxHeight: MediaQuery.of(context).size.height * 0.8,
+                                  //   ),
+                                  //   child: popupWidget,
+                                  // ),
+
+                                  showSelectedItems: true,
+                                  
+                                  
+                                  fit: FlexFit.tight,
+                                  showSearchBox: true,
+                                  searchFieldProps: TextFieldProps(
+
+                                    decoration: InputDecoration(
+                                      hintText: 'Search',
+                                      hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                      border: InputBorder.none,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  itemBuilder: (context, item, isDisabled, isSelected) => Container(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        color: AppColors.primary,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  modalBottomSheetProps: ModalBottomSheetProps(
+                                    // enableDrag: false,
+                                    // anchorPoint: Offset(0, 0),
+
+                                
+                                    shape: BeveledRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    barrierColor: Colors.black.withOpacity(0.5),
+                                  ),
+                                ),
+                                onChanged: (city) {
+                                  debugPrint('City changed: ${city?.name}, id: ${city?.id}');
+                                  setState(() {
+                                    _selectedCity = city;
+                                  });
+                                  debugPrint('_selectedCity after update: ${_selectedCity?.id}');
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select a city';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       const SizedBox(height: 16),
                       // Password field
                       CustomTextField(

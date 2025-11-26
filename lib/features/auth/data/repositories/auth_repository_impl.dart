@@ -18,14 +18,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     String? phone,
+    String? state,
+    String? city,
   }) async {
     try {
+      print('state: $state');
+      print('city: $city');
       final result = await remoteDataSource.register(
         firstName: firstName,
         lastName: lastName,
         email: email,
         password: password,
         phone: phone,
+        state: state,
+        city: city,
       );
       return Right(result);
     } on ServerException catch (e) {

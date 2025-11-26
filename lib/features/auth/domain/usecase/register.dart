@@ -13,7 +13,7 @@ class RegisterUsecase extends UsecaseWithParams<Map<String, dynamic>, RegisterPa
   final AuthRepository _repository;
   
   @override
-  ResultFuture<Map<String, dynamic>> call(RegisterParams params) async => _repository.register(firstName: params.firstName, lastName: params.lastName, email: params.email, password: params.password, phone: params.phone);
+  ResultFuture<Map<String, dynamic>> call(RegisterParams params) async => _repository.register(firstName: params.firstName, lastName: params.lastName, email: params.email, password: params.password, phone: params.phone, state: params.state, city: params.city);
 }
 
 
@@ -23,9 +23,11 @@ class RegisterParams  extends Equatable{
   final String email;
   final String password;
   final String? phone;
+  final String? state;
+  final String? city;
 
   //constructor
-  const RegisterParams({required this.firstName, required this.lastName, required this.email, required this.password, this.phone,});
+  const RegisterParams({required this.firstName, required this.lastName, required this.email, required this.password, this.phone, this.state, this.city,});
   @override
-  List<Object?> get props => [firstName, lastName, email, password, phone];
+  List<Object?> get props => [firstName, lastName, email, password, phone, state, city];
 }

@@ -8,6 +8,8 @@ abstract class AuthRepository {
     required String email,
     required String password,
     String? phone,
+    required String? state,
+    required String? city,
   });
 
   ResultFuture<Map<String, dynamic>> login({

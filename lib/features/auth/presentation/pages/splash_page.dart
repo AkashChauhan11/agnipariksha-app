@@ -16,8 +16,8 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-       if (!mounted) return;
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       context.read<AuthCubit>().checkAuthStatus();
     });
   }

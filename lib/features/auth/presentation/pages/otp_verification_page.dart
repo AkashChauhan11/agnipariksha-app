@@ -6,15 +6,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
-import '../widgets/custom_button.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
 
   const OtpVerificationPage({
-    Key? key,
+    super.key,
     required this.email,
-  }) : super(key: key);
+  });
+  
+  // Helper getter for design mode
+  String get displayEmail => email.isEmpty ? 'user@example.com' : email;
 
   @override
   State<OtpVerificationPage> createState() => _OtpVerificationPageState();
@@ -75,7 +77,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     final otp = _getOtpCode();
     if (otp.length == 6) {
       context.read<AuthCubit>().verifyOtp(
-            email: widget.email,
+            email: widget.displayEmail,
             otp: otp,
           );
     } else {
@@ -90,7 +92,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   void _handleResendOtp() {
     if (_canResend) {
-      context.read<AuthCubit>().resendOtp(email: widget.email);
+      context.read<AuthCubit>().resendOtp(email: widget.displayEmail);
       _startResendTimer();
     }
   }
@@ -98,14 +100,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is OtpVerificationSuccess) {
@@ -142,100 +137,143 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
           return SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Icon(
-                    Icons.mark_email_unread_outlined,
-                    size: 100,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'Verify Your Email',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Enter the 6-digit code sent to',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppColors.secondaryText,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.email,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(
-                      6,
-                      (index) => _buildOtpField(index),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    // OTP illustration
+                    Image.asset(
+                      'assets/images/otp.png',
+                      height: 200,
+                      fit: BoxFit.contain,
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  CustomButton(
-                    text: 'Verify OTP',
-                    onPressed: _handleVerifyOtp,
-                    isLoading: isLoading,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Didn't receive the code? ",
-                        style: const TextStyle(color: AppColors.secondaryText),
-                      ),
-                      TextButton(
-                        onPressed: _canResend && !isLoading
-                            ? _handleResendOtp
-                            : null,
-                        child: Text(
-                          _canResend
-                              ? 'Resend'
-                              : 'Resend in ${_resendTimer}s',
-                          style: const TextStyle(
+                    const SizedBox(height: 24),
+                    // OTP verification heading
+                    Text(
+                      'Verify Your Email',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                             color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 20,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    const SizedBox(height: 8),
+                    Text(
+                      'Enter the 6-digit code sent to',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: AppColors.secondaryText,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.displayEmail,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    // OTP input fields
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(
+                        6,
+                        (index) => _buildOtpField(index),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Verify OTP button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _handleVerifyOtp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: AppColors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Verify OTP',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Resend OTP link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue.shade700),
-                        const SizedBox(width: 12),
-                        Expanded(
+                        Text(
+                          "Didn't receive the code? ",
+                          style: const TextStyle(color: AppColors.secondaryText,fontSize: 12),
+                        ),
+                        TextButton(
+                          onPressed: _canResend && !isLoading
+                              ? _handleResendOtp
+                              : null,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: Text(
-                            'The OTP is valid for 10 minutes. Please check your spam folder if you don\'t see the email.',
-                            style: TextStyle(
-                              color: Colors.blue.shade700,
-                              fontSize: 12,
+                            _canResend
+                                ? 'Resend'
+                                : 'Resend in ${_resendTimer}s',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    // Info container
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.blue.shade700),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'The OTP is valid for 10 minutes. Please check your spam folder if you don\'t see the email.',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           );

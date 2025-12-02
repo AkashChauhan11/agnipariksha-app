@@ -17,6 +17,9 @@ class ApiConstants {
   static const String getStates = '/location/states';
   static const String getCities = '/location/cities';
   
+  // Tag endpoints
+  static const String getTags = '/tag';
+  
   // Headers
   static const String contentType = 'application/json';
   static const String authorization = 'Authorization';

@@ -9,6 +9,7 @@ import 'package:agni_pariksha/features/auth/domain/usecase/validate_session.dart
 import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
 import 'package:agni_pariksha/features/location/domain/usecase/get_states_by_country.dart';
 import 'package:agni_pariksha/features/location/domain/usecase/get_cities_by_state.dart';
+import 'package:agni_pariksha/features/tag/domain/usecase/get_tags_by_type.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +28,12 @@ import 'features/location/data/datasources/location_remote_data_source.dart';
 import 'features/location/data/repositories/location_repository_impl.dart';
 import 'features/location/domain/repositories/location_repository.dart';
 import 'features/location/presentation/cubit/location_cubit.dart';
+
+// Tag
+import 'features/tag/data/datasources/tag_remote_data_source.dart';
+import 'features/tag/data/repositories/tag_repository_impl.dart';
+import 'features/tag/domain/repositories/tag_repository.dart';
+import 'features/tag/presentation/cubit/tag_cubit.dart';
 
 
 
@@ -100,6 +107,30 @@ Future<void> init() async {
     () => LocationCubit(
       getStatesByCountryUsecase: sl(),
       getCitiesByStateUsecase: sl(),
+    ),
+  );
+
+  // ========================
+  // Features - Tag
+  // ========================
+
+  // Data sources
+  sl.registerLazySingleton<TagRemoteDataSource>(
+    () => TagRemoteDataSourceImpl(apiService: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<TagRepository>(
+    () => TagRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetTagsByTypeUsecase(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => TagCubit(
+      getTagsByTypeUsecase: sl(),
     ),
   );
 

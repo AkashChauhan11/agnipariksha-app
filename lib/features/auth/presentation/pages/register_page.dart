@@ -109,7 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
         body:  BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is RegistrationSuccess) {
-            //Registration successful, show snackbar and redirect to OTP verification page
+            // Registration successful, show snackbar and redirect to OTP verification page
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),

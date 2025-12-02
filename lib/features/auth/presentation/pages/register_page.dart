@@ -69,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a state'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
         return;
@@ -79,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a city'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
         return;
@@ -105,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return    Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         body:  BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is RegistrationSuccess) {
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -128,7 +128,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -158,7 +158,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text(
                         'Sign up to get started',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: const Color(0xFF666666),
+                              color: AppColors.secondaryText,
                             ),
                       ),
                       const SizedBox(height: 32),
@@ -231,7 +231,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           
                           return Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F5F5),
+                              color: AppColors.lightGrey,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: AppColors.primary.withOpacity(0.3),
@@ -249,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               decoratorProps: DropDownDecoratorProps(
                                 decoration: InputDecoration(
                                   hintText: 'Select State',
-                                  hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                  hintStyle: const TextStyle(color: AppColors.hintText),
                                   
                                   prefixIcon: Icon(
                                     Icons.location_on_outlined,
@@ -273,7 +273,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 searchFieldProps: TextFieldProps(
                                   decoration: InputDecoration(
                                     hintText: 'Search',
-                                    hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                    hintStyle: const TextStyle(color: AppColors.hintText),
                                     border: InputBorder.none,
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 8,
@@ -291,8 +291,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   shape: BeveledRectangleBorder(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  backgroundColor: Colors.white,
-                                  barrierColor: Colors.black.withOpacity(0.5),
+                                  backgroundColor: AppColors.white,
+                                  barrierColor: AppColors.black.withOpacity(0.5),
 
 
                                 ),
@@ -334,7 +334,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             
                             return Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF5F5F5),
+                                color: AppColors.lightGrey,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: AppColors.primary.withOpacity(0.3),
@@ -352,7 +352,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 decoratorProps: DropDownDecoratorProps(
                                   decoration: InputDecoration(
                                     hintText: 'Select City',
-                                    hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                    hintStyle: const TextStyle(color: AppColors.hintText),
                                     prefixIcon: Icon(
                                       Icons.location_city_outlined,
                                       color: AppColors.primary,
@@ -384,7 +384,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                     decoration: InputDecoration(
                                       hintText: 'Search',
-                                      hintStyle: const TextStyle(color: Color(0xFF999999)),
+                                      hintStyle: const TextStyle(color: AppColors.hintText),
                                       border: InputBorder.none,
                                       contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 8,
@@ -410,8 +410,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     shape: BeveledRectangleBorder(
                                       borderRadius: BorderRadius.circular(5),
                                     ),
-                                    backgroundColor: Colors.white,
-                                    barrierColor: Colors.black.withOpacity(0.5),
+                                    backgroundColor: AppColors.white,
+                                    barrierColor: AppColors.black.withOpacity(0.5),
                                   ),
                                 ),
                                 onChanged: (city) {
@@ -496,7 +496,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   height: 24,
                                   width: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -505,7 +505,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                         ),
@@ -517,7 +517,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         children: [
                           const Text(
                             "Already have an account? ",
-                            style: TextStyle(color: Color(0xFF666666)),
+                            style: TextStyle(color: AppColors.secondaryText),
                           ),
                           TextButton(
                             onPressed: isLoading

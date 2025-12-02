@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         title: 'Agni Pariksha',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         routerConfig: appRouter.router,
         debugShowCheckedModeBanner: false,
       ),

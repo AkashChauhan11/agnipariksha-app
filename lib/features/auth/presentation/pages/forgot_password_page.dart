@@ -1,3 +1,4 @@
+import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -34,6 +35,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -46,7 +48,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -60,7 +62,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -81,13 +83,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       'Forgot Password?',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Enter your email address and we will send you an OTP to reset your password',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey,
+                            color: AppColors.secondaryText,
                           ),
                     ),
                     const SizedBox(height: 60),
@@ -117,14 +120,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Remember your password? '),
+                        const Text(
+                          'Remember your password? ',
+                          style: TextStyle(color: AppColors.secondaryText),
+                        ),
                         TextButton(
                           onPressed: isLoading
                               ? null
                               : () {
                                   context.pop();
                                 },
-                          child: const Text('Login'),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),

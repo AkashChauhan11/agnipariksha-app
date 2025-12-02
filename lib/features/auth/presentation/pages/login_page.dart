@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Login successful!'),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: Duration(seconds: 2),
               ),
             );
@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.warning,
                 duration: const Duration(seconds: 4),
               ),
             );
@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                                   height: 24,
                                   width: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                         ),
@@ -218,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Text(
                             "Didn't have an account? ",
-                            style: TextStyle(color: Color(0xFF666666)),
+                            style: TextStyle(color: AppColors.secondaryText),
                           ),
                           TextButton(
                             onPressed: isLoading

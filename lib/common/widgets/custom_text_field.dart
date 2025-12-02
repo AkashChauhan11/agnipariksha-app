@@ -25,23 +25,22 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: TextFormField(
+    return TextFormField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         validator: validator,
         decoration: InputDecoration(
+          fillColor: AppColors.lightGrey,
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF999999)),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: AppColors.error,
+            ),
+          ),
+          
           prefixIcon: Icon(
             prefixIcon,
             color: AppColors.primary,
@@ -63,8 +62,7 @@ class CustomTextField extends StatelessWidget {
             vertical: 16,
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

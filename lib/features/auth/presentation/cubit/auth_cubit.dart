@@ -96,12 +96,15 @@ class AuthCubit extends Cubit<AuthState> {
           firstName: userMap['firstName'] as String,
           lastName: userMap['lastName'] as String,
           role: userMap['role'] as String,
+          phone: userMap['phone'] as String,
           isActive: userMap['isActive'] as bool,
           isVerified: userMap['isVerified'] as bool,
         );
+
         emit(
           LoginSuccess(user: user, accessToken: data['accessToken'] as String),
         );
+        emit(Authenticated(user: user));
       } else {
         emit(AuthError(message: 'Unexpected response from server'));
       }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -81,7 +82,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter complete OTP'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
     }
@@ -111,7 +112,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Email verified successfully!'),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: Duration(seconds: 2),
               ),
             );
@@ -124,14 +125,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
               ),
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -149,20 +150,21 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   Icon(
                     Icons.mark_email_unread_outlined,
                     size: 100,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.primary,
                   ),
                   const SizedBox(height: 32),
                   Text(
                     'Verify Your Email',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Enter the 6-digit code sent to',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
+                          color: AppColors.secondaryText,
                         ),
                   ),
                   const SizedBox(height: 4),
@@ -192,7 +194,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     children: [
                       Text(
                         "Didn't receive the code? ",
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: const TextStyle(color: AppColors.secondaryText),
                       ),
                       TextButton(
                         onPressed: _canResend && !isLoading
@@ -202,6 +204,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           _canResend
                               ? 'Resend'
                               : 'Resend in ${_resendTimer}s',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -257,8 +263,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: Theme.of(context).primaryColor,
+            borderSide: const BorderSide(
+              color: AppColors.primary,
               width: 2,
             ),
           ),

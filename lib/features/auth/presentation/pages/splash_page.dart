@@ -1,4 +1,5 @@
 import 'package:agni_pariksha/core/routes/route_names.dart';
+import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
@@ -39,17 +40,18 @@ class _SplashPageState extends State<SplashPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: AppColors.background,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.local_fire_department, size: 100, color: Colors.red),
+              Icon(Icons.local_fire_department, size: 100, color: AppColors.primary),
               const SizedBox(height: 24),
               Text(
                 'Agni Pariksha',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -57,7 +59,7 @@ class _SplashPageState extends State<SplashPage> {
                 'Your Learning Companion',
                 style: Theme.of(
                   context,
-                ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                ).textTheme.bodyLarge?.copyWith(color: AppColors.secondaryText),
               ),
               const SizedBox(height: 48),
               const CircularProgressIndicator(),

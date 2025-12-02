@@ -1,3 +1,4 @@
+import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,7 +53,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter complete 6-digit OTP'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
       return;
@@ -86,7 +87,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -101,7 +102,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.success,
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -109,7 +110,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
               ),
             );
           }
@@ -130,13 +131,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       'Reset Password',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Enter the OTP sent to ${widget.email} and create a new password',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey,
+                            color: AppColors.secondaryText,
                           ),
                     ),
                     const SizedBox(height: 40),
@@ -220,7 +222,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: isLoading ? null : _handleResendOtp,
-                        child: const Text('Resend OTP'),
+                        child: const Text(
+                          'Resend OTP',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -233,14 +241,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Remember your password? '),
+                        const Text(
+                          'Remember your password? ',
+                          style: TextStyle(color: AppColors.secondaryText),
+                        ),
                         TextButton(
                           onPressed: isLoading
                               ? null
                               : () {
                                   context.go('/login');
                                 },
-                          child: const Text('Login'),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -273,8 +290,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: Theme.of(context).primaryColor,
+            borderSide: const BorderSide(
+              color: AppColors.primary,
               width: 2,
             ),
           ),

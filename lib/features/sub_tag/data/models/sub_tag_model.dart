@@ -38,13 +38,9 @@ class SubTagModel extends SubTag {
   static SubTagType _subTagTypeFromString(String type) {
     switch (type.toLowerCase()) {
       case 'class':
-        return SubTagType.class_;
-      case 'year':
-        return SubTagType.year;
-      case 'chapter':
-        return SubTagType.chapter;
-      case 'topic':
-        return SubTagType.topic;
+        return SubTagType.class_; 
+      case 'subcategory':
+        return SubTagType.subcategory;
       default:
         throw ArgumentError('Unknown sub-tag type: $type');
     }
@@ -54,12 +50,8 @@ class SubTagModel extends SubTag {
     switch (type) {
       case SubTagType.class_:
         return 'class';
-      case SubTagType.year:
-        return 'year';
-      case SubTagType.chapter:
-        return 'chapter';
-      case SubTagType.topic:
-        return 'topic';
+      case SubTagType.subcategory:
+        return 'subcategory';
     }
   }
 }

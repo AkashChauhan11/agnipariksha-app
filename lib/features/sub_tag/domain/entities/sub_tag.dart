@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum SubTagType { class_, year, chapter, topic }
+enum SubTagType { class_, subcategory }
 
 class SubTag extends Equatable {
   final String id;

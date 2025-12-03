@@ -20,6 +20,7 @@ class TagRepositoryImpl implements TagRepository {
       );
       return Right(result);
     } on ServerException catch (e) {
+      print("error in repository: ${e.toString()}");
       return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message, e.statusCode));

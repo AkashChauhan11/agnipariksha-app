@@ -15,6 +15,7 @@ class SubTagRepositoryImpl implements SubTagRepository {
   ResultFuture<List<SubTag>> getSubTagsByTagId(String tagId) async {
     try {
       final result = await remoteDataSource.getSubTagsByTagId(tagId);
+      
       return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, e.statusCode));

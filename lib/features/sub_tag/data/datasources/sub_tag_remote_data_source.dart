@@ -33,6 +33,7 @@ class SubTagRemoteDataSourceImpl implements SubTagRemoteDataSource {
           .map((json) => SubTagModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
+      print("error in remote data source: ${e.toString()}");
       rethrow;
     }
   }

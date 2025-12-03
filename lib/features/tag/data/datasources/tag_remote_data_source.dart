@@ -36,10 +36,13 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
         data = [];
       }
 
+      print("data: $data");
+
       return data
           .map((json) => TagModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
+      print("error in data source: ${e.toString()}");
       rethrow;
     }
   }

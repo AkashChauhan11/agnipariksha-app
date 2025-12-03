@@ -114,13 +114,13 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Categories',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                  // Text(
+                  //   'Categories',
+                  //   style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 12),
                   BlocBuilder<TagCubit, TagState>(
                     builder: (context, tagState) {
                       if (tagState is TagLoading || tagState is TagInitial) {
@@ -155,11 +155,16 @@ class HomePage extends StatelessWidget {
                             final tag = allTags[index];
                             return InkWell(
                               onTap: () {
-                                // Navigate to sub-tags page
-                                context.push(
-                                  '/sub-tags/${tag.id}',
-                                  extra: {'tagName': tag.name},
-                                );
+                                // Special condition: if tag is 'subject-tag', show subject tags
+                                if (tag.id == 'subject-tag') {
+                                  context.push('/subject-tags');
+                                } else {
+                                  // Navigate to sub-tags page for other tags
+                                  context.push(
+                                    '/sub-tags/${tag.id}',
+                                    extra: {'tagName': tag.name},
+                                  );
+                                }
                               },
                               child: Container(
                                 decoration: BoxDecoration(

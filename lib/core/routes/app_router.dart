@@ -12,6 +12,7 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/sub_tag/presentation/pages/sub_tag_list_page.dart';
+import '../../features/tag/presentation/pages/subject_tag_list_page.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
 
@@ -87,6 +88,16 @@ class AppRouter {
           return MaterialPage(
             key: state.pageKey,
             child: SubTagListPage(tagId: tagId, tagName: tagName),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/subject-tags',
+        name: 'subject-tags',
+        pageBuilder: (context, state) {
+          return MaterialPage(
+            key: state.pageKey,
+            child: const SubjectTagListPage(),
           );
         },
       ),

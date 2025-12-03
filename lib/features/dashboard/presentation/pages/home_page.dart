@@ -32,9 +32,9 @@ class HomePage extends StatelessWidget {
                       return Text(
                         "Hi, ${state.user.fullName}!",
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.secondaryText,
-                            ),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.secondaryText,
+                        ),
                       );
                     }
                     return Text("Not logged in");
@@ -117,8 +117,8 @@ class HomePage extends StatelessWidget {
                   Text(
                     'Categories',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   BlocBuilder<TagCubit, TagState>(
@@ -139,22 +139,27 @@ class HomePage extends StatelessWidget {
                             updatedAt: DateTime.now(),
                           ),
                         ];
-                        
+
                         return GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            childAspectRatio: 0.85,
-                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 0.85,
+                              ),
                           itemCount: allTags.length,
                           itemBuilder: (context, index) {
                             final tag = allTags[index];
                             return InkWell(
                               onTap: () {
-                                // Handle tag tap
+                                // Navigate to sub-tags page
+                                context.push(
+                                  '/sub-tags/${tag.id}',
+                                  extra: {'tagName': tag.name},
+                                );
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -179,7 +184,9 @@ class HomePage extends StatelessWidget {
                                       width: 60,
                                       height: 60,
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.1),
+                                        color: AppColors.primary.withOpacity(
+                                          0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Image.asset(
@@ -189,7 +196,9 @@ class HomePage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 8),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
                                       child: Text(
                                         tag.name,
                                         textAlign: TextAlign.center,
@@ -210,7 +219,9 @@ class HomePage extends StatelessWidget {
                         );
                       }
                       if (tagState is TagError) {
-                        return Center(child: Text('Error: ${tagState.message}'));
+                        return Center(
+                          child: Text('Error: ${tagState.message}'),
+                        );
                       }
                       return const SizedBox.shrink();
                     },
@@ -221,7 +232,7 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Subject Option
-        const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Create Your Own Quiz Option
             Padding(
@@ -238,26 +249,27 @@ class HomePage extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.add_circle_outline,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
                         const SizedBox(width: 12),
                         Text(
                           'Create Your Own Quiz',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         const Spacer(),
                         Icon(
                           Icons.arrow_forward_ios,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
                       ],
                     ),

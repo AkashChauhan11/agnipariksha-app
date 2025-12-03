@@ -10,6 +10,7 @@ import 'package:agni_pariksha/features/auth/domain/usecase/logout.dart';
 import 'package:agni_pariksha/features/location/domain/usecase/get_states_by_country.dart';
 import 'package:agni_pariksha/features/location/domain/usecase/get_cities_by_state.dart';
 import 'package:agni_pariksha/features/tag/domain/usecase/get_tags_by_type.dart';
+import 'package:agni_pariksha/features/sub_tag/domain/usecase/get_sub_tags_by_tag_id.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,7 +36,11 @@ import 'features/tag/data/repositories/tag_repository_impl.dart';
 import 'features/tag/domain/repositories/tag_repository.dart';
 import 'features/tag/presentation/cubit/tag_cubit.dart';
 
-
+// SubTag
+import 'features/sub_tag/data/datasources/sub_tag_remote_data_source.dart';
+import 'features/sub_tag/data/repositories/sub_tag_repository_impl.dart';
+import 'features/sub_tag/domain/repositories/sub_tag_repository.dart';
+import 'features/sub_tag/presentation/cubit/sub_tag_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -46,10 +51,7 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(
-      apiService: sl(),
-      storageService: sl(),
-    ),
+    () => AuthRemoteDataSourceImpl(apiService: sl(), storageService: sl()),
   );
 
   // Repository
@@ -128,11 +130,27 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetTagsByTypeUsecase(sl()));
 
   // Cubit
-  sl.registerFactory(
-    () => TagCubit(
-      getTagsByTypeUsecase: sl(),
-    ),
+  sl.registerFactory(() => TagCubit(getTagsByTypeUsecase: sl()));
+
+  // ========================
+  // Features - SubTag
+  // ========================
+
+  // Data sources
+  sl.registerLazySingleton<SubTagRemoteDataSource>(
+    () => SubTagRemoteDataSourceImpl(apiService: sl()),
   );
+
+  // Repository
+  sl.registerLazySingleton<SubTagRepository>(
+    () => SubTagRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetSubTagsByTagIdUsecase(sl()));
+
+  // Cubit
+  sl.registerFactory(() => SubTagCubit(getSubTagsByTagIdUsecase: sl()));
 
   // ========================
   // Core
@@ -149,4 +167,3 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 }
-

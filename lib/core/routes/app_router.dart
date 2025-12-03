@@ -11,6 +11,7 @@ import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/sub_tag/presentation/pages/sub_tag_list_page.dart';
 import '../services/storage_service.dart';
 import 'route_names.dart';
 
@@ -74,6 +75,20 @@ class AppRouter {
         name: 'dashboard',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const DashboardScreen()),
+      ),
+      GoRoute(
+        path: '/sub-tags/:tagId',
+        name: 'sub-tags',
+        pageBuilder: (context, state) {
+          final tagId = state.pathParameters['tagId'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          final tagName = extra?['tagName'] as String? ?? 'Sub Tags';
+
+          return MaterialPage(
+            key: state.pageKey,
+            child: SubTagListPage(tagId: tagId, tagName: tagName),
+          );
+        },
       ),
     ],
     errorPageBuilder: (context, state) => MaterialPage(

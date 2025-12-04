@@ -9,13 +9,11 @@ class SubTagCubit extends Cubit<SubTagState> {
     : super(SubTagInitial());
 
   Future<void> loadSubTagsByTagId(String tagId) async {
-    print("loadSubTagsByTagId: $tagId");
     emit(SubTagLoading());
 
     final result = await getSubTagsByTagIdUsecase(
       GetSubTagsByTagIdParams(tagId: tagId),
     );
-    print("result: $result");
 
     result.fold(
       (failure) => emit(SubTagError(message: failure.message)),

@@ -222,7 +222,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           
                           if (locationState is LocationCubitState.StatesLoaded) {
                             states = locationState.states;
-                            print(states);
                             isLoadingStates = false;
 
                           } else if (locationState is LocationCubitState.LocationLoading) {

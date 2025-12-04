@@ -1,8 +1,6 @@
-import 'package:agni_pariksha/core/routes/go_router_refresh_stream.dart';
-import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:agni_pariksha/features/location/presentation/cubit/location_cubit.dart';
+ 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+ 
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -13,10 +11,8 @@ import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/sub_tag/presentation/pages/sub_tag_list_page.dart';
 import '../../features/tag/presentation/pages/subject_tag_list_page.dart';
-import '../services/storage_service.dart';
 import 'route_names.dart';
 
-import '../../injection_container.dart' as di;
 
 class AppRouter {
   late final GoRouter router = GoRouter(

@@ -12,7 +12,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onPasswordToggle;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.hintText,
     required this.prefixIcon,
@@ -21,7 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.showPasswordToggle = false,
     this.onPasswordToggle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

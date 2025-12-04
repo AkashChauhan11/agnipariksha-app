@@ -11,13 +11,11 @@ class TagCubit extends Cubit<TagState> {
   }) : super(TagInitial());
 
   Future<void> loadTagsByType(TagType type, {bool? isActive}) async {
-    print("loadTagsByType: $type");
     emit(TagLoading());
 
     final result = await getTagsByTypeUsecase(
       GetTagsByTypeParams(type: type, isActive: isActive),
     );
-    print("result: $result");
 
     result.fold(
       (failure) => emit(TagError(message: failure.message)),

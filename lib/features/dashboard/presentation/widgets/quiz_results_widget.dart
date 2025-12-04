@@ -4,7 +4,7 @@ import '../../domain/entities/quiz.dart';
 import '../bloc/quiz_bloc.dart';
 
 class QuizResultsWidget extends StatelessWidget {
-  const QuizResultsWidget({Key? key}) : super(key: key);
+  const QuizResultsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,6 @@ class QuizResultsWidget extends StatelessWidget {
     final isExcellent = score >= 90;
     final isGood = score >= 70;
     final isAverage = score >= 50;
-    final isPoor = score < 50;
 
     Color scoreColor;
     String scoreMessage;

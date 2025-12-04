@@ -22,8 +22,6 @@ class AuthRepositoryImpl implements AuthRepository {
     String? city,
   }) async {
     try {
-      print('state: $state');
-      print('city: $city');
       final result = await remoteDataSource.register(
         firstName: firstName,
         lastName: lastName,

@@ -70,7 +70,7 @@ class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
 
       final response = await apiService.get(
         ApiConstants.getStates,
-        queryParameters: queryParams,
+        // queryParameters: queryParams,
       );
 
       final responseData = response.data;

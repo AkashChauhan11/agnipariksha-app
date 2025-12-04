@@ -11,7 +11,14 @@ abstract class LocationState extends Equatable {
 
 class LocationInitial extends LocationState {}
 
-class LocationLoading extends LocationState {}
+class LocationLoading extends LocationState {
+  final List<State>? states; // Preserve states during loading
+
+  const LocationLoading({this.states});
+
+  @override
+  List<Object?> get props => [states];
+}
 
 class StatesLoaded extends LocationState {
   final List<State> states;
@@ -23,20 +30,21 @@ class StatesLoaded extends LocationState {
 }
 
 class CitiesLoaded extends LocationState {
+  final List<State> states; // Preserve states when cities are loaded
   final List<City> cities;
 
-  const CitiesLoaded({required this.cities});
+  const CitiesLoaded({required this.states, required this.cities});
 
   @override
-  List<Object?> get props => [cities];
+  List<Object?> get props => [states, cities];
 }
 
 class LocationError extends LocationState {
   final String message;
+  final List<State>? states; // Preserve states on error
 
-  const LocationError({required this.message});
+  const LocationError({required this.message, this.states});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, states];
 }
-

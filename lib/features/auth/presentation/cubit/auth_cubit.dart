@@ -92,6 +92,7 @@ class AuthCubit extends Cubit<AuthState> {
         final userMap = data['user'] as Map<String, dynamic>;
         final user = User(
           id: userMap['id'] as String,
+          code: userMap['userCode'] as String,
           email: email,
           firstName: userMap['firstName'] as String,
           lastName: userMap['lastName'] as String,
@@ -124,6 +125,7 @@ class AuthCubit extends Cubit<AuthState> {
         final userMap = data['user'] as Map<String, dynamic>;
         final user = User(
           id: userMap['id'] as String,
+          code: userMap['userCode'] as String,
           email: email,
           firstName: userMap['firstName'] as String,
           lastName: userMap['lastName'] as String,

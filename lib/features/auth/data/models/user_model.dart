@@ -7,6 +7,7 @@ import '../../domain/entities/user.dart';
 class UserModel extends User {
   UserModel({
     required super.id,
+    required super.code,
     required super.email,
     required super.firstName,
     required super.lastName,
@@ -24,6 +25,7 @@ class UserModel extends User {
   factory UserModel.fromMap(DataMap map) {
     return UserModel(
       id: map['id'] as String,
+      code: map['userCode'] as String,
       email: map['email'] as String,
       firstName: map['firstName'] as String,
       lastName: map['lastName'] as String,
@@ -37,6 +39,7 @@ class UserModel extends User {
 
   UserModel copyWith({
     String? id,
+    String? code,
     String? email,
     String? firstName,
     String? lastName,
@@ -47,6 +50,7 @@ class UserModel extends User {
   }) {
     return UserModel(
       id: id ?? this.id,
+      code: code ?? this.code,
       email: email ?? this.email,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
@@ -60,6 +64,7 @@ class UserModel extends User {
   DataMap toMap() {
     return {
       'id': id,
+      'code': code,
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
@@ -77,6 +82,7 @@ class UserModel extends User {
   User toEntity() {
     return User(
       id: id,
+      code: code,
       email: email,
       firstName: firstName,
       lastName: lastName,

@@ -48,6 +48,13 @@ class ProfilePage extends StatelessWidget {
                           color: AppColors.secondaryText,
                         ),
                   ),
+                  // User Code
+                  Text(
+                    state is Authenticated ? state.user.code : 'user@example.com',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.secondaryText,
+                        ),
+                  ),
                   const SizedBox(height: 40),
               // Profile Options
               _buildProfileOption(

@@ -135,6 +135,8 @@ class HomePage extends StatelessWidget {
                             name: 'Subject',
                             type: TagType.subject,
                             isActive: true,
+                            isHierarchical: true,
+                            hierarchicalType: TagHierarchicalType.subject,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now(),
                           ),
@@ -155,14 +157,18 @@ class HomePage extends StatelessWidget {
                             final tag = allTags[index];
                             return InkWell(
                               onTap: () {
-                                // Special condition: if tag is 'subject-tag', show subject tags
-                                if (tag.id == 'subject-tag') {
+                                 
+                                if (tag.isHierarchical) {
+                                  if(tag.hierarchicalType == TagHierarchicalType.subject){
                                   context.push('/subject-tags');
+                                  }else if(tag.hierarchicalType == TagHierarchicalType.subtag){
+                                  context.push('/sub-tags/${tag.id}', extra: {'tagName': tag.name});
+                                  }
                                 } else {
-                                  // Navigate to sub-tags page for other tags
-                                  context.push(
-                                    '/sub-tags/${tag.id}',
-                                    extra: {'tagName': tag.name},
+                                  //Open modal for start Quiz logic
+                                  //show scaffold message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('On click Quiz will start')),
                                   );
                                 }
                               },

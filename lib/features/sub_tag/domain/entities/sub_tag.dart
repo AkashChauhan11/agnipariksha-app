@@ -6,6 +6,7 @@ class SubTag extends Equatable {
   final String id;
   final String name;
   final String tagId;
+  final int order;
   final SubTagType type;
   final bool isActive;
   final DateTime createdAt;
@@ -14,6 +15,7 @@ class SubTag extends Equatable {
   const SubTag({
     required this.id,
     required this.name,
+    required this.order,
     required this.tagId,
     required this.type,
     required this.isActive,

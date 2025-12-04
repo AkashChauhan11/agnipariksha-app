@@ -1,3 +1,4 @@
+import 'package:agni_pariksha/core/constants/api_constants.dart';
 import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
@@ -157,18 +158,24 @@ class HomePage extends StatelessWidget {
                             final tag = allTags[index];
                             return InkWell(
                               onTap: () {
-                                 
                                 if (tag.isHierarchical) {
-                                  if(tag.hierarchicalType == TagHierarchicalType.subject){
-                                  context.push('/subject-tags');
-                                  }else if(tag.hierarchicalType == TagHierarchicalType.subtag){
-                                  context.push('/sub-tags/${tag.id}', extra: {'tagName': tag.name});
+                                  if (tag.hierarchicalType ==
+                                      TagHierarchicalType.subject) {
+                                    context.push('/subject-tags');
+                                  } else if (tag.hierarchicalType ==
+                                      TagHierarchicalType.subtag) {
+                                    context.push(
+                                      '/sub-tags/${tag.id}',
+                                      extra: {'tagName': tag.name},
+                                    );
                                   }
                                 } else {
                                   //Open modal for start Quiz logic
                                   //show scaffold message
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('On click Quiz will start')),
+                                    SnackBar(
+                                      content: Text('On click Quiz will start'),
+                                    ),
                                   );
                                 }
                               },
@@ -200,10 +207,22 @@ class HomePage extends StatelessWidget {
                                         ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: Image.asset(
-                                        'assets/images/ncert.png',
-                                        fit: BoxFit.contain,
-                                      ),
+                                      child: tag.image != null
+                                          ? Image.network(
+                                              '${ApiConstants.baseUrl}/uploads/${tag.image}',
+                                              fit: BoxFit.contain,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/ncert.png',
+                                                      fit: BoxFit.contain,
+                                                    );
+                                                  },
+                                            )
+                                          : Image.asset(
+                                              'assets/images/ncert.png',
+                                              fit: BoxFit.contain,
+                                            ),
                                     ),
                                     const SizedBox(height: 8),
                                     Padding(

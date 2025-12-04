@@ -19,7 +19,11 @@ class SubTagCubit extends Cubit<SubTagState> {
 
     result.fold(
       (failure) => emit(SubTagError(message: failure.message)),
-      (subTags) => emit(SubTagsLoaded(subTags: subTags)),
+      (subTags) => emit(
+        SubTagsLoaded(
+          subTags: subTags..sort((a, b) => a.order.compareTo(b.order)),
+        ),
+      ),
     );
   }
 }

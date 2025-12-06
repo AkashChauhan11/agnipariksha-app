@@ -150,14 +150,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = responseData['data'] as Map<String, dynamic>;
       
       // Save token and user data after successful verification
-      if (data['accessToken'] != null) {
-        await storageService.saveAccessToken(data['accessToken']);
-        await storageService.setLoggedIn(true);
+      // if (data['accessToken'] != null) {
+      //   await storageService.saveAccessToken(data['accessToken']);
+      //   await storageService.setLoggedIn(true);
         
-        if (data['user'] != null) {
-          await storageService.saveUserData(jsonEncode(data['user']));
-        }
-      }
+      //   if (data['user'] != null) {
+      //     await storageService.saveUserData(jsonEncode(data['user']));
+      //   }
+      // }
 
       // Add message from response root if available
       if (responseData['message'] != null) {

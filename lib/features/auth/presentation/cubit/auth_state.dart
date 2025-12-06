@@ -58,15 +58,15 @@ class LoginUnverified extends AuthState {
 // OTP verification states
 class OtpVerificationSuccess extends AuthState {
   final User user;
-  final String accessToken;
+ 
 
   const OtpVerificationSuccess({
     required this.user,
-    required this.accessToken,
+  
   });
 
   @override
-  List<Object?> get props => [user, accessToken];
+  List<Object?> get props => [user];
 }
 
 // OTP resend states

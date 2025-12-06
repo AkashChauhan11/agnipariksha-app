@@ -1,20 +1,17 @@
 import 'dart:async';
 import 'package:agni_pariksha/core/theme/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pinput/pinput.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
 
-  const OtpVerificationPage({
-    super.key,
-    required this.email,
-  });
-  
+  const OtpVerificationPage({super.key, required this.email});
+
   // Helper getter for design mode
   String get displayEmail => email.isEmpty ? 'user@example.com' : email;
 
@@ -23,10 +20,9 @@ class OtpVerificationPage extends StatefulWidget {
 }
 
 class _OtpVerificationPageState extends State<OtpVerificationPage> {
-  final List<TextEditingController> _otpControllers =
-      List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _pinFocusNode = FocusNode();
+
   int _resendTimer = 60;
   Timer? _timer;
   bool _canResend = false;
@@ -39,12 +35,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   void dispose() {
-    for (var controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _pinController.dispose();
+    _pinFocusNode.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -69,17 +61,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     });
   }
 
-  String _getOtpCode() {
-    return _otpControllers.map((controller) => controller.text).join();
-  }
-
   void _handleVerifyOtp() {
-    final otp = _getOtpCode();
+    final otp = _pinController.text;
     if (otp.length == 6) {
-      context.read<AuthCubit>().verifyOtp(
-            email: widget.displayEmail,
-            otp: otp,
-          );
+      context.read<AuthCubit>().verifyOtp(email: widget.displayEmail, otp: otp);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -99,6 +84,46 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Pinput themes
+    final defaultPinTheme = PinTheme(
+      width: 50,
+      height: 56,
+      textStyle: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: AppColors.black,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.grey),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary, width: 2),
+      ),
+    );
+
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary),
+      ),
+    );
+
+    final errorPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.error, width: 2),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
@@ -106,14 +131,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
           if (state is OtpVerificationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Email verified successfully!'),
+                content: Text('Registration successful, login to continue'),
                 backgroundColor: AppColors.success,
                 duration: Duration(seconds: 2),
               ),
             );
             Future.delayed(const Duration(milliseconds: 500), () {
               if (context.mounted) {
-                context.go('/dashboard');
+                context.go('/login');
               }
             });
           } else if (state is OtpResendSuccess) {
@@ -153,7 +178,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     // OTP verification heading
                     Text(
                       'Verify Your Email',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
                             fontSize: 20,
@@ -163,26 +189,48 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     Text(
                       'Enter the 6-digit code sent to',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.secondaryText,
-                          ),
+                        color: AppColors.secondaryText,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       widget.displayEmail,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
-                    // OTP input fields
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        6,
-                        (index) => _buildOtpField(index),
+                    // OTP input using Pinput
+                    Pinput(
+                      length: 6,
+                      controller: _pinController,
+                      focusNode: _pinFocusNode,
+                      defaultPinTheme: defaultPinTheme,
+                      focusedPinTheme: focusedPinTheme,
+                      submittedPinTheme: submittedPinTheme,
+                      errorPinTheme: errorPinTheme,
+                      pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+                      showCursor: true,
+                      cursor: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            width: 22,
+                            height: 2,
+                            color: AppColors.primary,
+                          ),
+                        ],
                       ),
+                      onCompleted: (pin) {
+                        // Auto-submit when all 6 digits are entered
+                        _handleVerifyOtp();
+                      },
+                      onChanged: (value) {
+                        // Optional: Add any onChange logic here
+                      },
                     ),
                     const SizedBox(height: 32),
                     // Verify OTP button
@@ -222,9 +270,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Didn't receive the code? ",
-                          style: const TextStyle(color: AppColors.secondaryText,fontSize: 12),
+                          style: TextStyle(
+                            color: AppColors.secondaryText,
+                            fontSize: 12,
+                          ),
                         ),
                         TextButton(
                           onPressed: _canResend && !isLoading
@@ -281,44 +332,4 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       ),
     );
   }
-
-  Widget _buildOtpField(int index) {
-    return SizedBox(
-      width: 45,
-      height: 55,
-      child: TextFormField(
-        controller: _otpControllers[index],
-        focusNode: _focusNodes[index],
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        maxLength: 1,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          counterText: '',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: AppColors.primary,
-              width: 2,
-            ),
-          ),
-        ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 5) {
-            _focusNodes[index + 1].requestFocus();
-          } else if (value.isEmpty && index > 0) {
-            _focusNodes[index - 1].requestFocus();
-          } else if (value.isNotEmpty && index == 5) {
-            // All OTP digits entered, hide keyboard
-            _focusNodes[index].unfocus();
-          }
-        },
-      ),
-    );
-  }
 }
-

@@ -64,6 +64,12 @@ class AppTheme {
               color: AppColors.error,
             ),
           ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:   BorderSide(
+              color: AppColors.primary.withOpacity(0.3),
+            ),
+          ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(

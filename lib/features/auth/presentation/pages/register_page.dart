@@ -210,8 +210,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 16),
                       // Phone field
                       CustomTextField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                            return 'Please enter a valid phone number';
+                          }
+                          return null;
+                        },
                         controller: _phoneController,
-                        hintText: 'Phone (Optional)',
+                        hintText: 'Phone',
                         prefixIcon: Icons.phone_outlined,
                         keyboardType: TextInputType.phone,
                       ),
@@ -240,34 +249,53 @@ class _RegisterPageState extends State<RegisterPage> {
                             states = locationState.states ?? [];
                           }
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.primary.withOpacity(0.3),
-                                width: 1,
+                          return DropdownSearch<LocationEntity.State>(
+                            key: const ValueKey('state_dropdown'),
+                            mode: Mode.form,
+                            items: (filter, loadProps) =>
+                                isLoadingStates ? [] : states,
+
+                            compareFn: (item, value) => item.id == value.id,
+                            itemAsString: (item) => item.name,
+                            // enabled: !isLoadingStates,
+                            decoratorProps: DropDownDecoratorProps(
+                              decoration: InputDecoration(
+                                fillColor: AppColors.lightGrey,
+                                filled: true,
+                                hintText: 'Select State',
+                                hintStyle: const TextStyle(
+                                  color: AppColors.hintText,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 1,
+                                  ),
+                                ),
+
+                                prefixIcon: Icon(
+                                  Icons.location_on_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 16,
+                                ),
                               ),
                             ),
-                            child: DropdownSearch<LocationEntity.State>(
-                              key: const ValueKey('state_dropdown'),
-                              mode: Mode.form,
-                              items: (filter, loadProps) =>
-                                  isLoadingStates ? [] : states,
 
-                              compareFn: (item, value) => item.id == value.id,
-                              itemAsString: (item) => item.name,
-                              // enabled: !isLoadingStates,
-                              decoratorProps: DropDownDecoratorProps(
+                            selectedItem: _selectedState,
+                            popupProps: PopupProps.modalBottomSheet(
+                              showSelectedItems: true,
+                              fit: FlexFit.tight,
+                              showSearchBox: true,
+                              searchDelay: Duration(seconds: 0),
+
+                              searchFieldProps: TextFieldProps(
                                 decoration: InputDecoration(
-                                  hintText: 'Select State',
+                                  hintText: 'Search',
                                   hintStyle: const TextStyle(
                                     color: AppColors.hintText,
-                                  ),
-
-                                  prefixIcon: Icon(
-                                    Icons.location_on_outlined,
-                                    color: AppColors.primary,
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(
@@ -276,80 +304,57 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                 ),
                               ),
-                              
-                              selectedItem: _selectedState,
-                              popupProps: PopupProps.modalBottomSheet(
-                                showSelectedItems: true,
-                                fit: FlexFit.tight,
-                                showSearchBox: true,
-                                
-                                searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.hintText,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                ),
-                                itemBuilder:
-                                    (context, item, isDisabled, isSelected) =>
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.all(12),
-                                          child: Text(
-                                            item.name,
-                                            style: const TextStyle(
+                              itemBuilder:
+                                  (context, item, isDisabled, isSelected) =>
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
                                               color: AppColors.primary,
-                                              fontSize: 16,
                                             ),
                                           ),
                                         ),
-                                modalBottomSheetProps: ModalBottomSheetProps(
-                                  shape: BeveledRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  backgroundColor: AppColors.white,
-                                  barrierColor: AppColors.black.withOpacity(
-                                    0.5,
-                                  ),
+                                        padding: const EdgeInsets.all(12),
+                                        child: Text(
+                                          item.name,
+                                          style: const TextStyle(
+                                            color: AppColors.primary,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                              modalBottomSheetProps: ModalBottomSheetProps(
+                                shape: BeveledRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
+                                backgroundColor: AppColors.white,
+                                barrierColor: AppColors.black.withOpacity(0.5),
                               ),
-                              onChanged: (state) {
-                                debugPrint(
-                                  'State changed: ${state?.name}, id: ${state?.id}',
-                                );
-                                setState(() {
-                                  _selectedState = state;
-                                  _selectedCity =
-                                      null; // Reset city when state changes
-                                });
-                                if (state != null) {
-                                  context
-                                      .read<LocationCubit>()
-                                      .loadCitiesByState(state.id);
-                                }
-                                debugPrint(
-                                  '_selectedState after update: ${_selectedState?.id}',
-                                );
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select a state';
-                                }
-                                return null;
-                              },
                             ),
+                            onChanged: (state) {
+                              debugPrint(
+                                'State changed: ${state?.name}, id: ${state?.id}',
+                              );
+                              setState(() {
+                                _selectedState = state;
+                                _selectedCity =
+                                    null; // Reset city when state changes
+                              });
+                              if (state != null) {
+                                context.read<LocationCubit>().loadCitiesByState(
+                                  state.id,
+                                );
+                              }
+                              debugPrint(
+                                '_selectedState after update: ${_selectedState?.id}',
+                              );
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select a state';
+                              }
+                              return null;
+                            },
                           );
                         },
                       ),
@@ -373,34 +378,64 @@ class _RegisterPageState extends State<RegisterPage> {
                             isLoadingCities = true;
                           }
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.primary.withOpacity(0.3),
-                                width: 1,
+                          return DropdownSearch<City>(
+                            key: const ValueKey('city_dropdown'),
+                            mode: Mode.form,
+                            enabled: _selectedState != null,
+
+                            
+
+                            items: (filter, loadProps) =>
+                                isLoadingCities ? [] : cities,
+                            compareFn: (item, value) => item.id == value.id,
+
+                            itemAsString: (item) => item.name,
+                            decoratorProps: DropDownDecoratorProps(
+                              
+                              decoration: InputDecoration(
+                                hintText: 'Select City',
+                                hintStyle: const TextStyle(
+                                  color: AppColors.hintText,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.location_city_outlined,
+                                  color: AppColors.primary,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 1,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 16,
+                                ),
                               ),
                             ),
-                            child: DropdownSearch<City>(
-                              key: const ValueKey('city_dropdown'),
-                              mode: Mode.form,
-                              enabled: _selectedState != null,
+                            selectedItem: _selectedCity,
+                            filterFn: (item, query) => item.name
+                                .toLowerCase()
+                                .contains(query.toLowerCase()),
+                            popupProps: PopupProps.modalBottomSheet(
+                              // containerBuilder: (context, popupWidget) =>
+                              // Container(
+                              //   constraints: BoxConstraints(
+                              //     maxHeight: MediaQuery.of(context).size.height * 0.8,
+                              //   ),
+                              //   child: popupWidget,
+                              // ),
+                              showSelectedItems: true,
 
-                              items: (filter, loadProps) =>
-                                  isLoadingCities ? [] : cities,
-                              compareFn: (item, value) => item.id == value.id,
+                              fit: FlexFit.tight,
+                              showSearchBox: true,
+                              searchDelay: Duration(seconds: 0),
 
-                              itemAsString: (item) => item.name,
-                              decoratorProps: DropDownDecoratorProps(
+                              searchFieldProps: TextFieldProps(
                                 decoration: InputDecoration(
-                                  hintText: 'Select City',
+                                  hintText: 'Search',
                                   hintStyle: const TextStyle(
                                     color: AppColors.hintText,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.location_city_outlined,
-                                    color: AppColors.primary,
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(
@@ -409,86 +444,52 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                 ),
                               ),
-                              selectedItem: _selectedCity,
-                              filterFn: (item, query) => item.name
-                                  .toLowerCase()
-                                  .contains(query.toLowerCase()),
-                              popupProps: PopupProps.modalBottomSheet(
-                                // containerBuilder: (context, popupWidget) =>
-                                // Container(
-                                //   constraints: BoxConstraints(
-                                //     maxHeight: MediaQuery.of(context).size.height * 0.8,
-                                //   ),
-                                //   child: popupWidget,
-                                // ),
-                                showSelectedItems: true,
-
-                                fit: FlexFit.tight,
-                                showSearchBox: true,
-                                searchDelay: Duration(seconds: 0),
-                                
-                                searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.hintText,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                ),
-                                itemBuilder:
-                                    (context, item, isDisabled, isSelected) =>
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.all(12),
-                                          child: Text(
-                                            item.name,
-                                            style: const TextStyle(
+                              itemBuilder:
+                                  (context, item, isDisabled, isSelected) =>
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
                                               color: AppColors.primary,
-                                              fontSize: 16,
                                             ),
                                           ),
                                         ),
-                                modalBottomSheetProps: ModalBottomSheetProps(
-                                  // enableDrag: false,
-                                  // anchorPoint: Offset(0, 0),
-                                  shape: BeveledRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  backgroundColor: AppColors.white,
-                                  barrierColor: AppColors.black.withOpacity(
-                                    0.5,
-                                  ),
+                                        padding: const EdgeInsets.all(12),
+                                        child: Text(
+                                          item.name,
+                                          style: const TextStyle(
+                                            color: AppColors.primary,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                              modalBottomSheetProps: ModalBottomSheetProps(
+                                // enableDrag: false,
+                                // anchorPoint: Offset(0, 0),
+                                shape: BeveledRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
+                                backgroundColor: AppColors.white,
+                                barrierColor: AppColors.black.withOpacity(0.5),
                               ),
-                              onChanged: (city) {
-                                debugPrint(
-                                  'City changed: ${city?.name}, id: ${city?.id}',
-                                );
-                                setState(() {
-                                  _selectedCity = city;
-                                });
-                                debugPrint(
-                                  '_selectedCity after update: ${_selectedCity?.id}',
-                                );
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select a city';
-                                }
-                                return null;
-                              },
                             ),
+                            onChanged: (city) {
+                              debugPrint(
+                                'City changed: ${city?.name}, id: ${city?.id}',
+                              );
+                              setState(() {
+                                _selectedCity = city;
+                              });
+                              debugPrint(
+                                '_selectedCity after update: ${_selectedCity?.id}',
+                              );
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select a city';
+                              }
+                              return null;
+                            },
                           );
                         },
                       ),

@@ -133,12 +133,8 @@ class AuthCubit extends Cubit<AuthState> {
           isActive: userMap['isActive'] as bool,
           isVerified: userMap['isVerified'] as bool,
         );
-        emit(
-          OtpVerificationSuccess(
-            user: user,
-            accessToken: data['accessToken'] as String,
-          ),
-        );
+        _clearSession(); // Ensure no stale session exists so user must login manually
+        emit(OtpVerificationSuccess(user: user));
       }
     });
   }
@@ -147,9 +143,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> resendOtp({required String email}) async {
     emit(AuthLoading());
 
-    final result = await resendOtpUsecase(
-      ResendOtpParams(email: email),
-    );
+    final result = await resendOtpUsecase(ResendOtpParams(email: email));
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
@@ -182,11 +176,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     final result = await resetPasswordUsecase(
-      ResetPasswordParams(
-        email: email,
-        otp: otp,
-        newPassword: newPassword,
-      ),
+      ResetPasswordParams(email: email, otp: otp, newPassword: newPassword),
     );
 
     result.fold(
@@ -200,7 +190,7 @@ class AuthCubit extends Cubit<AuthState> {
     // First check if we have token and login flag
     final isLoggedIn = await storageService.isLoggedIn();
     final accessToken = await storageService.getAccessToken();
-    
+
     if (!isLoggedIn || accessToken == null || accessToken.isEmpty) {
       emit(Unauthenticated());
       return;
@@ -208,7 +198,7 @@ class AuthCubit extends Cubit<AuthState> {
 
     // Validate token with backend
     emit(AuthLoading());
-    
+
     final result = await validateSessionUsecase();
 
     result.fold(

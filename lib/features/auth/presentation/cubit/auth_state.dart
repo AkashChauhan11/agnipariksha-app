@@ -19,10 +19,7 @@ class RegistrationSuccess extends AuthState {
   final String email;
   final String message;
 
-  const RegistrationSuccess({
-    required this.email,
-    required this.message,
-  });
+  const RegistrationSuccess({required this.email, required this.message});
 
   @override
   List<Object?> get props => [email, message];
@@ -33,10 +30,7 @@ class LoginSuccess extends AuthState {
   final User user;
   final String accessToken;
 
-  const LoginSuccess({
-    required this.user,
-    required this.accessToken,
-  });
+  const LoginSuccess({required this.user, required this.accessToken});
 
   @override
   List<Object?> get props => [user, accessToken];
@@ -46,10 +40,7 @@ class LoginUnverified extends AuthState {
   final String email;
   final String message;
 
-  const LoginUnverified({
-    required this.email,
-    required this.message,
-  });
+  const LoginUnverified({required this.email, required this.message});
 
   @override
   List<Object?> get props => [email, message];
@@ -58,12 +49,8 @@ class LoginUnverified extends AuthState {
 // OTP verification states
 class OtpVerificationSuccess extends AuthState {
   final User user;
- 
 
-  const OtpVerificationSuccess({
-    required this.user,
-  
-  });
+  const OtpVerificationSuccess({required this.user});
 
   @override
   List<Object?> get props => [user];
@@ -84,16 +71,22 @@ class ForgotPasswordSuccess extends AuthState {
   final String email;
   final String message;
 
-  const ForgotPasswordSuccess({
-    required this.email,
-    required this.message,
-  });
+  const ForgotPasswordSuccess({required this.email, required this.message});
 
   @override
   List<Object?> get props => [email, message];
 }
 
 // Reset password states
+class ResetOtpVerificationSuccess extends AuthState {
+  final String message;
+
+  const ResetOtpVerificationSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class ResetPasswordSuccess extends AuthState {
   final String message;
 
@@ -128,4 +121,3 @@ class AuthError extends AuthState {
 
 // Logout state
 class LogoutSuccess extends AuthState {}
-

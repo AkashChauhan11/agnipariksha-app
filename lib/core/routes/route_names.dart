@@ -5,6 +5,7 @@ class RouteNames {
   static const String register = '/register';
   static const String otpVerification = '/otp-verification';
   static const String forgotPassword = '/forgot-password';
+  static const String verifyResetOtp = '/verify-reset-otp';
   static const String resetPassword = '/reset-password';
 
   // App routes

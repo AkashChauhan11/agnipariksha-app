@@ -18,34 +18,25 @@ abstract class AuthRemoteDataSource {
     String? city,
   });
 
-  Future<DataMap> login({
-    required String email,
-    required String password,
-  });
+  Future<DataMap> login({required String email, required String password});
 
-  Future<DataMap> verifyOtp({
-    required String email,
-    required String otp,
-  });
+  Future<DataMap> verifyOtp({required String email, required String otp});
 
-  Future<DataMap> resendOtp({
-    required String email,
-  });
+  Future<DataMap> resendOtp({required String email});
 
-  Future<DataMap> forgotPassword({
-    required String email,
-  });
+  Future<DataMap> forgotPassword({required String email});
+
+  Future<DataMap> verifyResetOtp({required String email, required String otp});
 
   Future<DataMap> resetPassword({
     required String email,
-    required String otp,
     required String newPassword,
   });
 
   Future<UserModel> getCurrentUser();
-  
+
   Future<UserModel> getProfile();
-  
+
   Future<void> logout();
 }
 
@@ -85,12 +76,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
       final data = responseData['data'] as Map<String, dynamic>;
-      
+
       // Add message from response root if available
       if (responseData['message'] != null) {
         data['message'] = responseData['message'];
       }
-      
+
       return data;
     } catch (e) {
       rethrow;
@@ -105,21 +96,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await apiService.post(
         ApiConstants.login,
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
-      
+
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
       final data = responseData['data'] as Map<String, dynamic>;
-      
+
       // If login is successful and user is verified, save token
       if (data['accessToken'] != null) {
         await storageService.saveAccessToken(data['accessToken']);
         await storageService.setLoggedIn(true);
-        
+
         if (data['user'] != null) {
           await storageService.saveUserData(jsonEncode(data['user']));
         }
@@ -139,21 +127,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await apiService.post(
         ApiConstants.verifyOtp,
-        data: {
-          'email': email,
-          'otp': otp,
-        },
+        data: {'email': email, 'otp': otp},
       );
 
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
       final data = responseData['data'] as Map<String, dynamic>;
-      
+
       // Save token and user data after successful verification
       // if (data['accessToken'] != null) {
       //   await storageService.saveAccessToken(data['accessToken']);
       //   await storageService.setLoggedIn(true);
-        
+
       //   if (data['user'] != null) {
       //     await storageService.saveUserData(jsonEncode(data['user']));
       //   }
@@ -171,24 +156,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> resendOtp({
-    required String email,
-  }) async {
+  Future<Map<String, dynamic>> resendOtp({required String email}) async {
     try {
       final response = await apiService.post(
         ApiConstants.resendOtp,
-        data: {
-          'email': email,
-        },
+        data: {'email': email},
       );
 
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
-      
+
       // For resend OTP, the message might be at root level
       return {
         'message': responseData['message'] ?? 'OTP has been resent',
-        if (responseData['data'] != null) ...responseData['data'] as Map<String, dynamic>,
+        if (responseData['data'] != null)
+          ...responseData['data'] as Map<String, dynamic>,
       };
     } catch (e) {
       rethrow;
@@ -200,7 +182,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       // First try to get from cache
       final userData = await storageService.getUserData();
-      
+
       if (userData != null) {
         try {
           final userJson = jsonDecode(userData) as DataMap;
@@ -210,7 +192,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           return await getProfile();
         }
       }
-      
+
       // If no cache, fetch from backend
       return await getProfile();
     } catch (e) {
@@ -222,15 +204,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> getProfile() async {
     try {
       final response = await apiService.get(ApiConstants.getProfile);
-      
+
       final responseData = response.data as Map<String, dynamic>;
-      final data = responseData['data'] as Map<String, dynamic>? ?? responseData;
-      
+      final data =
+          responseData['data'] as Map<String, dynamic>? ?? responseData;
+
       final userModel = UserModel.fromMap(data);
-      
+
       // Save updated user data to cache
       await storageService.saveUserData(userModel.toJson());
-      
+
       return userModel;
     } catch (e) {
       rethrow;
@@ -238,24 +221,47 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> forgotPassword({
-    required String email,
-  }) async {
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
     try {
       final response = await apiService.post(
         ApiConstants.forgotPassword,
-        data: {
-          'email': email,
-        },
+        data: {'email': email},
       );
 
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
-      
+
       // For forgot password, the message might be at root level
       return {
-        'message': responseData['message'] ?? 'Password reset OTP has been sent to your email',
-        if (responseData['data'] != null) ...responseData['data'] as Map<String, dynamic>,
+        'message':
+            responseData['message'] ??
+            'Password reset OTP has been sent to your email',
+        if (responseData['data'] != null)
+          ...responseData['data'] as Map<String, dynamic>,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await apiService.post(
+        ApiConstants.verifyResetOtp,
+        data: {'email': email, 'otp': otp},
+      );
+
+      // Extract data from nested response structure
+      final responseData = response.data as Map<String, dynamic>;
+
+      return {
+        'message': responseData['message'] ?? 'OTP verified successfully',
+        if (responseData['data'] != null)
+          ...responseData['data'] as Map<String, dynamic>,
       };
     } catch (e) {
       rethrow;
@@ -265,25 +271,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<Map<String, dynamic>> resetPassword({
     required String email,
-    required String otp,
     required String newPassword,
   }) async {
     try {
       final response = await apiService.post(
         ApiConstants.resetPassword,
-        data: {
-          'email': email,
-          'otp': otp,
-          'newPassword': newPassword,
-        },
+        data: {'email': email, 'newPassword': newPassword},
       );
 
       // Extract data from nested response structure
       final responseData = response.data as Map<String, dynamic>;
-      
+
       return {
-        'message': responseData['message'] ?? 'Password has been reset successfully',
-        if (responseData['data'] != null) ...responseData['data'] as Map<String, dynamic>,
+        'message':
+            responseData['message'] ?? 'Password has been reset successfully',
+        if (responseData['data'] != null)
+          ...responseData['data'] as Map<String, dynamic>,
       };
     } catch (e) {
       rethrow;
@@ -299,4 +302,3 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 }
-

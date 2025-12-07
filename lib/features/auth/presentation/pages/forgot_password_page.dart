@@ -26,8 +26,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void _handleForgotPassword() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().forgotPassword(
-            email: _emailController.text.trim(),
-          );
+        email: _emailController.text.trim(),
+      );
     }
   }
 
@@ -45,10 +45,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 duration: const Duration(seconds: 3),
               ),
             );
-            // Navigate to reset password page
+            // Navigate to verify reset OTP page
             Future.delayed(const Duration(milliseconds: 500), () {
               if (context.mounted) {
-                context.go('/reset-password', extra: state.email);
+                context.go('/verify-reset-otp', extra: state.email);
               }
             });
           } else if (state is AuthError) {
@@ -94,9 +94,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Text(
                         'Enter your email address and we will send you an OTP to reset your password',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppColors.secondaryText,
-                              fontSize: 12,
-                            ),
+                          color: AppColors.secondaryText,
+                          fontSize: 12,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -110,8 +110,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                              .hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return 'Please enter a valid email';
                           }
                           return null;
@@ -192,4 +193,3 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 }
-

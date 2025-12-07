@@ -3,6 +3,7 @@ import 'package:agni_pariksha/features/auth/domain/usecase/login.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/verify_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/verify_reset_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/validate_session.dart';
@@ -18,6 +19,7 @@ class AuthCubit extends Cubit<AuthState> {
   final VerifyOtpUsecase verifyOtpUsecase;
   final ResendOtpUsecase resendOtpUsecase;
   final ForgotPasswordUsecase forgotPasswordUsecase;
+  final VerifyResetOtpUsecase verifyResetOtpUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
   final GetCurrentUserUsecase getCurrentUserUsecase;
   final ValidateSessionUsecase validateSessionUsecase;
@@ -30,6 +32,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this.verifyOtpUsecase,
     required this.resendOtpUsecase,
     required this.forgotPasswordUsecase,
+    required this.verifyResetOtpUsecase,
     required this.resetPasswordUsecase,
     required this.getCurrentUserUsecase,
     required this.validateSessionUsecase,
@@ -167,16 +170,33 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
+  // Verify reset password OTP
+  Future<void> verifyResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    emit(AuthLoading());
+
+    final result = await verifyResetOtpUsecase(
+      VerifyResetOtpParams(email: email, otp: otp),
+    );
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (data) =>
+          emit(ResetOtpVerificationSuccess(message: data['message'] as String)),
+    );
+  }
+
   // Reset password
   Future<void> resetPassword({
     required String email,
-    required String otp,
     required String newPassword,
   }) async {
     emit(AuthLoading());
 
     final result = await resetPasswordUsecase(
-      ResetPasswordParams(email: email, otp: otp, newPassword: newPassword),
+      ResetPasswordParams(email: email, newPassword: newPassword),
     );
 
     result.fold(

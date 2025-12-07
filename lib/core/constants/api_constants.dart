@@ -8,6 +8,7 @@ class ApiConstants {
   static const String verifyOtp = '/auth/verify-otp';
   static const String resendOtp = '/auth/resend-otp';
   static const String forgotPassword = '/auth/forgot-password';
+  static const String verifyResetOtp = '/auth/verify-reset-otp';
   static const String resetPassword = '/auth/reset-password';
   static const String getProfile = '/auth/profile';
   static const String validateToken = '/auth/validate';

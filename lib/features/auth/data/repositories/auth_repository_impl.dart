@@ -73,15 +73,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required String otp,
   }) async {
     try {
-      final result = await remoteDataSource.verifyOtp(
-        email: email,
-        otp: otp,
-      );
+      final result = await remoteDataSource.verifyOtp(email: email, otp: otp);
       return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, e.statusCode));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message, e.statusCode      ));
+      return Left(NetworkFailure(e.message, e.statusCode));
     } on ValidationException catch (e) {
       return Left(ValidationFailure(e.message, e.statusCode));
     } catch (e) {
@@ -90,9 +87,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  ResultFuture<DataMap> resendOtp({
-    required String email,
-  }) async {
+  ResultFuture<DataMap> resendOtp({required String email}) async {
     try {
       final result = await remoteDataSource.resendOtp(email: email);
       return Right(result);
@@ -106,9 +101,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  ResultFuture<DataMap> forgotPassword({
-    required String email,
-  }) async {
+  ResultFuture<DataMap> forgotPassword({required String email}) async {
     try {
       final result = await remoteDataSource.forgotPassword(email: email);
       return Right(result);
@@ -124,15 +117,35 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  ResultFuture<DataMap> resetPassword({
+  ResultFuture<DataMap> verifyResetOtp({
     required String email,
     required String otp,
+  }) async {
+    try {
+      final result = await remoteDataSource.verifyResetOtp(
+        email: email,
+        otp: otp,
+      );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e.statusCode));
+    } on ValidationException catch (e) {
+      return Left(ValidationFailure(e.message, e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure('Unexpected error occurred', 500));
+    }
+  }
+
+  @override
+  ResultFuture<DataMap> resetPassword({
+    required String email,
     required String newPassword,
   }) async {
     try {
       final result = await remoteDataSource.resetPassword(
         email: email,
-        otp: otp,
         newPassword: newPassword,
       );
       return Right(result);
@@ -193,4 +206,3 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 }
-

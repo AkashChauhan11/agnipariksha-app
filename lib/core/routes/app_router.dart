@@ -1,18 +1,17 @@
- 
 import 'package:flutter/material.dart';
- 
+
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/verify_reset_otp_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/sub_tag/presentation/pages/sub_tag_list_page.dart';
 import '../../features/tag/presentation/pages/subject_tag_list_page.dart';
 import 'route_names.dart';
-
 
 class AppRouter {
   late final GoRouter router = GoRouter(
@@ -55,6 +54,17 @@ class AppRouter {
         name: 'forgot-password',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const ForgotPasswordPage()),
+      ),
+      GoRoute(
+        path: RouteNames.verifyResetOtp,
+        name: 'verify-reset-otp',
+        pageBuilder: (context, state) {
+          final email = state.extra as String?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: VerifyResetOtpPage(email: email ?? ''),
+          );
+        },
       ),
       GoRoute(
         path: RouteNames.resetPassword,

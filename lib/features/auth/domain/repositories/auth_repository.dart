@@ -22,26 +22,25 @@ abstract class AuthRepository {
     required String otp,
   });
 
-  ResultFuture<Map<String, dynamic>> resendOtp({
-    required String email,
-  });
+  ResultFuture<Map<String, dynamic>> resendOtp({required String email});
 
-  ResultFuture<Map<String, dynamic>> forgotPassword({
+  ResultFuture<Map<String, dynamic>> forgotPassword({required String email});
+
+  ResultFuture<Map<String, dynamic>> verifyResetOtp({
     required String email,
+    required String otp,
   });
 
   ResultFuture<Map<String, dynamic>> resetPassword({
     required String email,
-    required String otp,
     required String newPassword,
   });
 
   ResultFuture<User> getCurrentUser();
-  
+
   ResultFuture<User> getProfile();
-  
+
   ResultVoid logout();
 }
 
 //
-

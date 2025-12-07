@@ -3,6 +3,7 @@ import 'package:agni_pariksha/features/auth/domain/usecase/login.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/verify_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/resend_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/forgot_password.dart';
+import 'package:agni_pariksha/features/auth/domain/usecase/verify_reset_otp.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/reset_password.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/get_current_user.dart';
 import 'package:agni_pariksha/features/auth/domain/usecase/validate_session.dart';
@@ -65,6 +66,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => VerifyOtpUsecase(sl()));
   sl.registerLazySingleton(() => ResendOtpUsecase(sl()));
   sl.registerLazySingleton(() => ForgotPasswordUsecase(sl()));
+  sl.registerLazySingleton(() => VerifyResetOtpUsecase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUsecase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUsecase(sl()));
   sl.registerLazySingleton(() => ValidateSessionUsecase(sl()));
@@ -78,6 +80,7 @@ Future<void> init() async {
       verifyOtpUsecase: sl(),
       resendOtpUsecase: sl(),
       forgotPasswordUsecase: sl(),
+      verifyResetOtpUsecase: sl(),
       resetPasswordUsecase: sl(),
       getCurrentUserUsecase: sl(),
       validateSessionUsecase: sl(),

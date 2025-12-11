@@ -12,6 +12,8 @@ import 'package:agni_pariksha/features/location/domain/usecase/get_states_by_cou
 import 'package:agni_pariksha/features/location/domain/usecase/get_cities_by_state.dart';
 import 'package:agni_pariksha/features/tag/domain/usecase/get_tags_by_type.dart';
 import 'package:agni_pariksha/features/sub_tag/domain/usecase/get_sub_tags_by_tag_id.dart';
+import 'package:agni_pariksha/features/quiz_question_count/domain/usecase/validate_subject.dart';
+import 'package:agni_pariksha/features/quiz_question_count/domain/usecase/start_quiz.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +44,17 @@ import 'features/sub_tag/data/datasources/sub_tag_remote_data_source.dart';
 import 'features/sub_tag/data/repositories/sub_tag_repository_impl.dart';
 import 'features/sub_tag/domain/repositories/sub_tag_repository.dart';
 import 'features/sub_tag/presentation/cubit/sub_tag_cubit.dart';
+
+// Quiz Question Count
+import 'features/quiz_question_count/data/datasources/question_count_remote_data_source.dart';
+import 'features/quiz_question_count/data/repositories/question_count_repository_impl.dart';
+import 'features/quiz_question_count/domain/repositories/question_count_repository.dart';
+import 'features/quiz_question_count/presentation/cubit/question_count_cubit.dart';
+
+// Quiz
+import 'features/quiz/data/datasources/quiz_remote_data_source.dart';
+import 'features/quiz/presentation/cubit/quiz_cubit.dart';
+import 'features/quiz/presentation/cubit/result_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -154,6 +167,48 @@ Future<void> init() async {
 
   // Cubit
   sl.registerFactory(() => SubTagCubit(getSubTagsByTagIdUsecase: sl()));
+
+  // ========================
+  // Features - Quiz Question Count
+  // ========================
+
+  // Data sources
+  sl.registerLazySingleton<QuestionCountRemoteDataSource>(
+    () => QuestionCountRemoteDataSourceImpl(apiService: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<QuestionCountRepository>(
+    () => QuestionCountRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => ValidateSubjectUsecase(sl()));
+  sl.registerLazySingleton(() => StartQuizUsecase(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => QuestionCountCubit(
+      validateSubjectUsecase: sl(),
+      startQuizUsecase: sl(),
+    ),
+  );
+
+  // ========================
+  // Features - Quiz
+  // ========================
+
+  // Data sources
+  sl.registerLazySingleton<QuizRemoteDataSource>(
+    () => FakeQuizApi(),
+  );
+
+  // Cubit
+  sl.registerFactory(
+    () => QuizCubit(api: sl()),
+  );
+
+  sl.registerFactory(() => ResultCubit());
 
   // ========================
   // Core

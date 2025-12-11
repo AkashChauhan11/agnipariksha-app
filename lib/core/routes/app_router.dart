@@ -11,6 +11,9 @@ import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/sub_tag/presentation/pages/sub_tag_list_page.dart';
 import '../../features/tag/presentation/pages/subject_tag_list_page.dart';
+import '../../features/quiz/presentation/pages/quiz_page.dart';
+import '../../features/quiz/presentation/pages/quiz_result_page.dart';
+import '../../features/quiz/domain/entities/result_data.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -104,6 +107,32 @@ class AppRouter {
           return MaterialPage(
             key: state.pageKey,
             child: const SubjectTagListPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.quiz,
+        name: 'quiz',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: QuizPage(
+              subjectId: extra?['subjectId'] as String? ?? '',
+              questionCount: extra?['questionCount'] as int? ?? 10,
+              considerTime: extra?['considerTime'] as bool? ?? false,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.quizResult,
+        name: 'quiz-result',
+        pageBuilder: (context, state) {
+          final result = state.extra as ResultData?;
+          return MaterialPage(
+            key: state.pageKey,
+            child: QuizResultPage(result: result!),
           );
         },
       ),

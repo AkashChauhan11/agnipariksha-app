@@ -5,6 +5,8 @@ import 'package:agni_pariksha/features/auth/presentation/cubit/auth_state.dart';
 import 'package:agni_pariksha/features/tag/domain/entities/tag.dart';
 import 'package:agni_pariksha/features/tag/presentation/cubit/tag_cubit.dart';
 import 'package:agni_pariksha/features/tag/presentation/cubit/tag_state.dart';
+import 'package:agni_pariksha/features/quiz_question_count/presentation/cubit/question_count_cubit.dart';
+import 'package:agni_pariksha/features/quiz_question_count/presentation/widgets/question_count_popup.dart';
 import 'package:agni_pariksha/injection_container.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -170,12 +172,27 @@ class HomePage extends StatelessWidget {
                                     );
                                   }
                                 } else {
-                                  //Open modal for start Quiz logic
-                                  //show scaffold message
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('On click Quiz will start'),
-                                    ),
+                                  // Open modal for start Quiz logic
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) {
+                                      final cubit = sl<QuestionCountCubit>();
+                                      cubit.validateSubject(tag.id);
+                                      return BlocProvider.value(
+                                        value: cubit,
+                                        child: QuestionCountPopup(
+                                          subjectId: tag.id,
+                                          onStart: (questionCount, considerTime) {
+                                            // Navigate to quiz screen
+                                            context.push('/quiz', extra: {
+                                              'subjectId': tag.id,
+                                              'questionCount': questionCount,
+                                              'considerTime': considerTime,
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    },
                                   );
                                 }
                               },
